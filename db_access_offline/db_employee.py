@@ -5,7 +5,6 @@ This file has all functions responsible for checking and editing informations fr
 import pandas as pd
 import importlib
 employee_class = importlib.import_module("classes.employee_class", ".")
-#.load_source("classes", "../classes/employee_class.py")
 
 # Get all employees from database
 # Return List<Employee>
@@ -16,7 +15,11 @@ def getAllEmployees():
         employee_name = dataBase["first_name"][i]
         employee_id = dataBase["idemp"][i]
         employee_email = dataBase["email"][i]
-        curr_employee = employee_class.Employee(employee_name, employee_email, employee_id)
+        employee_password = dataBase["password"][i]
+        employee_isAdmin = dataBase["isadmin"][i]
+        employee_score = dataBase["score"][i]
+        curr_employee = employee_class.Employee(employee_name, employee_email, employee_password, employee_score,
+                                                employee_isAdmin, employee_id)
         employee_list.append(curr_employee)
     return employee_list
 
@@ -30,7 +33,11 @@ def getEmployeePerEmail(userEmail):
         if (employee_email == userEmail):
             employee_name = dataBase["first_name"][i]
             employee_id = dataBase["idemp"][i]
-            curr_employee = employee_class.Employee(employee_name, employee_email, employee_id)
+            employee_password = dataBase["password"][i]
+            employee_isAdmin = dataBase["isadmin"][i]
+            employee_score = dataBase["score"][i]
+            curr_employee = employee_class.Employee(employee_name, employee_email, employee_password, employee_score,
+                                                employee_isAdmin, employee_id)
             return curr_employee
     return False
 
@@ -45,7 +52,11 @@ def getEmployeePerID(userID):
         if (employee_id == userID):
             employee_name = dataBase["first_name"][i]
             employee_email = dataBase["email"][i]
-            curr_employee = employee_class.Employee(employee_name, employee_email, employee_id)
+            employee_password = dataBase["password"][i]
+            employee_isAdmin = dataBase["isadmin"][i]
+            employee_score = dataBase["score"][i]
+            curr_employee = employee_class.Employee(employee_name, employee_email, employee_password, employee_score,
+                                                employee_isAdmin, employee_id)
             return curr_employee
     return False
 
@@ -92,13 +103,17 @@ def deleteEmployee(userID):
     dataBase = pd.read_csv('employee_db.csv')
     newDB = pd.DataFrame(columns=['idemp', 'first_name', 'email'])
     for i in range(len(dataBase)):
-        currEmployeeName = dataBase["first_name"][i]
-        curEmployeeEmail = dataBase["email"][i]
-        currEmployeeID = dataBase["idemp"][i]
-        if (currEmployeeID != userID):
-            newData = [{'idemp': currEmployeeID, 'first_name': currEmployeeName, 'email': curEmployeeEmail}]
+        employee_id = dataBase["idemp"][i]
+        if (employee_id != userID):
+            employee_email = dataBase["email"][i]
+            employee_password = dataBase["password"][i]
+            employee_isAdmin = dataBase["isadmin"][i]
+            employee_score = dataBase["score"][i]
+            employee_name = dataBase["first_name"][i]
+            newData = [{'idemp': employee_id, 'first_name': employee_name, 'email': employee_email, "password": employee_password,
+                        'isadmin': employee_isAdmin, 'score': employee_score}]
             newDB = newDB.append(newData, ignore_index=True)
-        if (currEmployeeID == userID):
+        if (employee_id == userID):
             userIDfound = True
     newDB.to_csv('./employee_db.csv', index=False)
     return userIDfound
@@ -107,13 +122,14 @@ def deleteEmployee(userID):
 # Receive String userName, String userEmail
 # Return True if he was added
 # Return False if he wasn't
-def addEmployee(userName, userEmail):
+def addEmployee(userName, userEmail, employee_password, employee_isAdmin, employee_score):
     dataBase = pd.read_csv('employee_db.csv')
     userEmailAvailable = emailAvailable(userEmail)
     if (userEmailAvailable):
-        employeeId = getNewEmployeeID()
-        newData = [{'idemp': employeeId, 'first_name': userName,
-                    'email': userEmail}]
+        employee_id = getNewEmployeeID()
+        newData = [
+            {'idemp': employee_id, 'first_name': userName, 'email': userEmail, "password": employee_password,
+             'isadmin': employee_isAdmin, 'score': employee_score}]
         dataBase = dataBase.append(newData, ignore_index=True)
         dataBase.to_csv('./employee_db.csv', index=False)
         return True
@@ -139,16 +155,15 @@ def emailAvailable(email):
         if (currEmail == email):
             return False
     return True
-'''
+
 def main():
     employeesList = getAllEmployees()
     for employee in employeesList:
         print(employee)
     print(getEmployeePerEmail("luna@gmail.com"))
-    print(getEmployeePerEmail("lunwwa@gmail.com"))
-    addEmployee("joao","joao@gmail.com")
-    print(pd.read_csv('employee_db.csv'))
-    deleteEmployee(2)
-    print(pd.read_csv('employee_db.csv'))
+    print(getEmployeePerEmail("luna@gmail.com"))
+    #addEmployee("joao","joao@gmail.com","asd123",1,20)
+    #print(pd.read_csv('employee_db.csv'))
+    #deleteEmployee(2)
+    #print(pd.read_csv('employee_db.csv'))
 main()
-'''

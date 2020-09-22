@@ -1,3 +1,4 @@
-idcom,idemp,date,comment,point
-0,1,18/09/19,'banheiro todo cagado',1
-1,0,20/09/19,'falta de um estabelecimento para guardar as ferramentas',1
+idcom,idemp,date,comment,score,area
+0,1,18/09/19,'banheiro todo cagado',1,uau
+1,0,20/09/19,'falta de um estabelecimento para guardar o alien',1,area51
+2,1,22/09/20,funcionou!,2,bamoo
