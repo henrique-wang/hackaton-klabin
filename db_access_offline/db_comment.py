@@ -104,7 +104,7 @@ def setPointForComment(comID, newPoint):
 
 def main():
     dataBase = pd.read_csv('employee_comments_db.csv')
-    #comments = getAllComments()
+    comments = getAllComments()
     #for comment in comments:
     #    print(comment)
     #addComment(1, "funcionou!", "bamoo")
@@ -113,8 +113,8 @@ def main():
     #last_date = '21/09/19'
     #listcomments = getCommentsPerDate(first_date, last_date)
     #print(listcomments[0])
-    #employe = employee_class.Employee('luna','luna@gmail.com','asdaas', 1, 0, 1)
+    #employe = employee_class.Employee('luna','luna@gmail.com','asdaas', 1, 0, 1,'path/to')
     #listcomments = getCommentsPerEmployee(employe)
     #print(listcomments[0])
-    #setPointForComment(2, 2)
+    #setPointForComment(2, 3)
 main()

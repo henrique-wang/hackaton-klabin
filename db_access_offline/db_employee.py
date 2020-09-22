@@ -10,6 +10,7 @@ employee_class = importlib.import_module("classes.employee_class", ".")
 # Return List<Employee>
 def getAllEmployees():
     dataBase = pd.read_csv('employee_db.csv')
+    print(dataBase)
     employee_list = []
     for i in range(len(dataBase)):
         employee_name = dataBase["first_name"][i]
@@ -18,8 +19,9 @@ def getAllEmployees():
         employee_password = dataBase["password"][i]
         employee_isAdmin = dataBase["isadmin"][i]
         employee_score = dataBase["score"][i]
+        employee_path = dataBase["photo_path"][i]
         curr_employee = employee_class.Employee(employee_name, employee_email, employee_password, employee_score,
-                                                employee_isAdmin, employee_id)
+                                                employee_isAdmin, employee_id, employee_path)
         employee_list.append(curr_employee)
     return employee_list
 
@@ -36,8 +38,9 @@ def getEmployeePerEmail(userEmail):
             employee_password = dataBase["password"][i]
             employee_isAdmin = dataBase["isadmin"][i]
             employee_score = dataBase["score"][i]
+            employee_path = dataBase["photo_path"][i]
             curr_employee = employee_class.Employee(employee_name, employee_email, employee_password, employee_score,
-                                                employee_isAdmin, employee_id)
+                                                employee_isAdmin, employee_id, employee_path)
             return curr_employee
     return False
 
@@ -55,8 +58,9 @@ def getEmployeePerID(userID):
             employee_password = dataBase["password"][i]
             employee_isAdmin = dataBase["isadmin"][i]
             employee_score = dataBase["score"][i]
+            employee_path = dataBase["photo_path"][i]
             curr_employee = employee_class.Employee(employee_name, employee_email, employee_password, employee_score,
-                                                employee_isAdmin, employee_id)
+                                                employee_isAdmin, employee_id, employee_path)
             return curr_employee
     return False
 
@@ -110,8 +114,9 @@ def deleteEmployee(userID):
             employee_isAdmin = dataBase["isadmin"][i]
             employee_score = dataBase["score"][i]
             employee_name = dataBase["first_name"][i]
+            employee_path = dataBase["photo_path"][i]
             newData = [{'idemp': employee_id, 'first_name': employee_name, 'email': employee_email, "password": employee_password,
-                        'isadmin': employee_isAdmin, 'score': employee_score}]
+                        'isadmin': employee_isAdmin, 'score': employee_score, 'photo_path': employee_path}]
             newDB = newDB.append(newData, ignore_index=True)
         if (employee_id == userID):
             userIDfound = True
@@ -122,14 +127,14 @@ def deleteEmployee(userID):
 # Receive String userName, String userEmail
 # Return True if he was added
 # Return False if he wasn't
-def addEmployee(userName, userEmail, employee_password, employee_isAdmin, employee_score):
+def addEmployee(userName, userEmail, employee_password, employee_isAdmin, employee_score, employee_path):
     dataBase = pd.read_csv('employee_db.csv')
     userEmailAvailable = emailAvailable(userEmail)
     if (userEmailAvailable):
         employee_id = getNewEmployeeID()
         newData = [
             {'idemp': employee_id, 'first_name': userName, 'email': userEmail, "password": employee_password,
-             'isadmin': employee_isAdmin, 'score': employee_score}]
+             'isadmin': employee_isAdmin, 'score': employee_score, 'photo_path': employee_path}]
         dataBase = dataBase.append(newData, ignore_index=True)
         dataBase.to_csv('./employee_db.csv', index=False)
         return True
@@ -158,11 +163,11 @@ def emailAvailable(email):
 
 def main():
     employeesList = getAllEmployees()
-    for employee in employeesList:
-        print(employee)
-    print(getEmployeePerEmail("luna@gmail.com"))
-    print(getEmployeePerEmail("luna@gmail.com"))
-    #addEmployee("joao","joao@gmail.com","asd123",1,20)
+    #for employee in employeesList:
+    #    print(employee)
+    #print(getEmployeePerEmail("luna@gmail.com"))
+    #print(getEmployeePerEmail("luna@gmail.com"))
+    #addEmployee("joao","joao@gmail.com","asd123",1,20,'path/to')
     #print(pd.read_csv('employee_db.csv'))
     #deleteEmployee(2)
     #print(pd.read_csv('employee_db.csv'))
