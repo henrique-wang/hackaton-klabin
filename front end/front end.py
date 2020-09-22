@@ -6,6 +6,12 @@ Created on Mon Aug 24 07:37:39 2020
 """
 from tkinter import *
 from tkinter import messagebox
+import importlib
+employee_class = importlib.import_module("classes.employee_class",".")
+employee_class = importlib.import_module("classes.employee_class", ".")
+#comment_class = importlib.import_module("classes.comment_class",".")
+#db_comment = importlib.import_module("db_access_offline.db_comment",".")
+db_employee = importlib.import_module("db_access_offline.db_employee",".")
 
 LARGE_FONT= ("Verdana", 12)
 
@@ -45,7 +51,7 @@ class ScrollFrame(Frame):#https://gist.github.com/mp035/9f2027c3ef9172264532fcd6
 
 class Window(Tk):
 
-     def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         
         Tk.__init__(self, *args, **kwargs)
         container = Frame(self)
@@ -68,17 +74,21 @@ class Window(Tk):
 
         self.show_frame(Login_page)
 
-     def show_frame(self, cont):
+    def show_frame(self, cont):
 
         frame = self.frames[cont]
         frame.tkraise()
 
-     def atualizar_usuario(self,ID):
+    def atualizar_usuario(self,ID):
          self.frames[Editar_funcionario_individual_page].atualizar(ID)
          self.show_frame(Editar_funcionario_individual_page)
 
-     def mostrar_comentario(self,ID):
+    def mostrar_comentario(self,ID):
          print("mostrando comentario " + str(ID))
+
+    def tabela_funcionarios(self):
+        self.frames[Editar_funcionario_tabela_page].editar_lista()
+        self.show_frame(Editar_funcionario_tabela_page)
         
 class Home_page(Frame):
     def __init__(self, parent, controller):
@@ -119,7 +129,7 @@ class Home_page(Frame):
         self.controller.show_frame(Comentarios_page)
         
     def editar_funcionarios(self,*args):
-       self.controller.show_frame(Editar_funcionario_tabela_page)
+       self.controller.tabela_funcionarios()
 
     def pontuacao(self,*args):
        self.controller.show_frame(Pontuacao_page)
@@ -240,12 +250,23 @@ class Adicionar_funcionario_page(Frame):
         self.controller.show_frame(Home_page)
     
     def confirmar(self,*args):
-        print("adicionar")
-        messagebox.showinfo("Ação completada","Usuário adicionado com sucesso")
-        self.nome.delete(0,'end')
-        self.email.delete(0,'end')
-        self.senha.delete(0,'end')
-        self.adm.deselect()
+        print("adicionar senha")
+        if (db_employee.emailAvailable(self.email.get())):
+            if (self.email.get()=="" or self.nome.get=="" or self.senha.get()==""):
+                messagebox.showinfo("Erro","Informações faltando")
+                self.senha.delete(0, 'end')
+            else:
+                db_employee.addEmployee(self.nome.get(),self.email.get())
+                messagebox.showinfo("Ação completada","Usuário adicionado com sucesso")
+                self.nome.delete(0, 'end')
+                self.email.delete(0, 'end')
+                self.senha.delete(0, 'end')
+                self.adm.deselect()
+        else:
+            messagebox.showinfo("Erro","Email já em uso")
+            self.email.delete(0, 'end')
+            self.senha.delete(0, 'end')
+
 
 class Editar_funcionario_tabela_page(Frame):
     
@@ -268,19 +289,23 @@ class Editar_funcionario_tabela_page(Frame):
         self.procura.grid(row=4,column=1)
 
         self.scrollframe = ScrollFrame(self)
-        self.scrollframe.grid(row=1,column=1,columnspan=5)
-        self.editar_lista()
-
+        self.scrollframe.grid(row=1, column=1, columnspan=5)
 
         
     def editar_lista(self,*args):
-        for row in range(len(funcionarios)):
-            Label(self.scrollframe.viewPort, text=funcionarios[row][0]).grid(row=row, column=0)
-            Label(self.scrollframe.viewPort, text=funcionarios[row][1]).grid(row=row, column=1)
+        lista=db_employee.getAllEmployees()
+
+        self.scrollframe.destroy()
+        self.scrollframe = ScrollFrame(self)
+        self.scrollframe.grid(row=1, column=1, columnspan=5)
+
+        for row in range(len(lista)):
+            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeName()).grid(row=row, column=0)
+            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeEmail()).grid(row=row, column=1)
             a=row
-            Button(self.scrollframe.viewPort, text=funcionarios[row][0], command=lambda x=a:
-                                        self.controller.atualizar_usuario(x)).grid(row=row, column=2)
-        
+            Button(self.scrollframe.viewPort, text="editar", command=lambda x=a:
+                                        self.controller.atualizar_usuario(lista[x].getEmployeeID())).grid(row=row, column=2)
+
     def voltar(self,*args):
         self.controller.show_frame(Home_page)
         
@@ -315,26 +340,32 @@ class Editar_funcionario_individual_page(Frame):
         self.button1.grid(row=10, column=3)
 
     def atualizar(self,ID):
-        print("atualizar")
         self.ID=ID
-        self.label2.configure(text="Nome: " + funcionarios[ID][0])
+        self.label2.configure(text="Nome: " + db_employee.getEmployeePerID(ID).getEmployeeName())
 
     def apagar(self,*args):
-        print("apagar")
+        db_employee.deleteEmployee(self.ID)
         messagebox.showinfo("Ação completada", "Usuário apagado com sucesso")
         self.email.delete(0, 'end')
-        self.controller.show_frame(Editar_funcionario_tabela_page)
+        self.controller.tabela_funcionarios()
 
 
     def confirmar(self,*args):
-        print("confirmar")
-        messagebox.showinfo("Ação completada", "Usuário atualizado com sucesso")
-        self.email.delete(0,'end')
-        self.controller.show_frame(Editar_funcionario_tabela_page)
+        email=self.email.get()
+        if (db_employee.emailAvailable(email)):
+            db_employee.setEmployeeEmail(self.ID,email)
+            messagebox.showinfo("Ação completada", "Usuário atualizado com sucesso")
+            self.controller.tabela_funcionarios()
+            self.email.delete(0, 'end')
+        else:
+            messagebox.showinfo("Erro","Email já em uso")
+            self.email.delete(0, 'end')
+
+
 
     def voltar(self,*args):
         self.email.delete(0,'end')
-        self.controller.show_frame(Editar_funcionario_tabela_page)
+        self.controller.tabela_funcionarios()
         
 class Comentarios_page(Frame):
     

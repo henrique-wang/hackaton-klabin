@@ -139,7 +139,7 @@ def emailAvailable(email):
         if (currEmail == email):
             return False
     return True
-
+'''
 def main():
     employeesList = getAllEmployees()
     for employee in employeesList:
@@ -151,3 +151,4 @@ def main():
     deleteEmployee(2)
     print(pd.read_csv('employee_db.csv'))
 main()
+'''
