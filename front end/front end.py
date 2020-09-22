@@ -76,12 +76,14 @@ class Window(Tk):
 
         self.frames = {}
 
+        paginas=[Home_page, Login_page, Pontuacao_page, Adicionar_funcionario_page,
+                  Editar_funcionario_tabela_page,Editar_funcionario_individual_page,Comentarios_page]
+
         for F in (Home_page, Login_page, Pontuacao_page, Adicionar_funcionario_page,
                   Editar_funcionario_tabela_page,Editar_funcionario_individual_page,Comentarios_page):
 
-            #frame = F(container, self)
-            frame = ScrollFrame(container)
-            frame.pointView=F(container,self)
+            frame = F(container, self)
+
 
             self.frames[F] = frame
 
@@ -178,7 +180,7 @@ class Login_page(Frame):
             self.controller.show_frame(Home_page)
         except:
             messagebox.showinfo("erro de login","usuário ou senha inválida")
-            self.controller.show_frame(Login_page)  
+            self.controller.show_frame(Login_page)
             self.nome.delete(0,'end')
             self.senha.delete(0,'end')
     
