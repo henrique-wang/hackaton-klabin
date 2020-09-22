@@ -1,0 +1,2 @@
+montar as funcções de procurar tanto para funcionarios quanto para comentarios
+criar view pontuacao

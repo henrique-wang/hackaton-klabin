@@ -9,23 +9,36 @@ from tkinter import messagebox
 import importlib
 employee_class = importlib.import_module("classes.employee_class",".")
 employee_class = importlib.import_module("classes.employee_class", ".")
-#comment_class = importlib.import_module("classes.comment_class",".")
-#db_comment = importlib.import_module("db_access_offline.db_comment",".")
+comment_class = importlib.import_module("classes.comment_class",".")
+db_comment = importlib.import_module("db_access_offline.db_comment",".")
 db_employee = importlib.import_module("db_access_offline.db_employee",".")
 
 LARGE_FONT= ("Verdana", 12)
+BRANCO="#fff"
+HOME=0
+LOGIN=1
+PONTUACAO=2
+ADICIONAR=3
+FUNCIONARIOS=4
+FUNCIONARIO=5
+COMENTARIOS=6
 
+'''
+
+banco de dados usuario:iduser|name|email|password|admin|score|path
+banco de dados de comentarios:idcom|iduser|data|comment|score|area
+
+'''
 
 adm={"a": ""}
-comentarios=[['a','b','c']]
-funcionarios=[["jorge","jorge@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["roberto","roberto@gmail"],["alfredo","alfredo@email"]]
+comentarios=[["a","b"]]
 
 class ScrollFrame(Frame):#https://gist.github.com/mp035/9f2027c3ef9172264532fcd6262f3b01 by mp035
     def __init__(self, parent):
         super().__init__(parent) # create a frame (self)
 
-        self.canvas = Canvas(self, borderwidth=0, background="#ffffff")          #place canvas on self
-        self.viewPort = Frame(self.canvas, background="#ffffff")                    #place a frame on the canvas, this frame will hold the child widgets
+        self.canvas = Canvas(self, borderwidth=0, background=BRANCO)          #place canvas on self
+        self.viewPort = Frame(self.canvas, background=BRANCO)                    #place a frame on the canvas, this frame will hold the child widgets
         self.vsb = Scrollbar(self, orient="vertical", command=self.canvas.yview) #place a scrollbar on self
         self.canvas.configure(yscrollcommand=self.vsb.set)                          #attach scrollbar action to scroll of canvas
 
@@ -54,7 +67,7 @@ class Window(Tk):
     def __init__(self, *args, **kwargs):
         
         Tk.__init__(self, *args, **kwargs)
-        container = Frame(self)
+        container = Frame(self, bg=BRANCO)
 
         container.pack(side="top", fill="both", expand = True)
 
@@ -66,7 +79,9 @@ class Window(Tk):
         for F in (Home_page, Login_page, Pontuacao_page, Adicionar_funcionario_page,
                   Editar_funcionario_tabela_page,Editar_funcionario_individual_page,Comentarios_page):
 
-            frame = F(container, self)
+            #frame = F(container, self)
+            frame = ScrollFrame(container)
+            frame.pointView=F(container,self)
 
             self.frames[F] = frame
 
@@ -89,53 +104,43 @@ class Window(Tk):
     def tabela_funcionarios(self):
         self.frames[Editar_funcionario_tabela_page].editar_lista()
         self.show_frame(Editar_funcionario_tabela_page)
+
+    def tabela_pontos(self):
+        self.frames[Pontuacao_page].editar_lista()
+        self.show_frame(Pontuacao_page)
         
 class Home_page(Frame):
     def __init__(self, parent, controller):
         self.controller=controller
-        Frame.__init__(self,parent)
-        label = Label(self, text="Home Page", font=LARGE_FONT)
+        Frame.__init__(self, parent,bg="#fff")
+        label = Label(self, text="Home Page", font=LARGE_FONT, bg=BRANCO)
         label.grid(row=0, column=0, columnspan=3,)
-        self.grid_columnconfigure(0,weight=1)
+        #self.grid_columnconfigure(0, weight=1)
         
         button1 = Button(self, text="Ver pontuação",
-                            command=self.pontuacao,width=21)
-        button1.grid(row=5, column=0,sticky="e")
-        self.grid_columnconfigure(1,weight=1)
+                            command=lambda: self.controller.tabela_pontos(), width=21)
+        button1.grid(row=5, column=0, sticky="e")
+        #self.grid_columnconfigure(1, weight=1)
         
-        space=Label(self)
-        space.grid(row=2,rowspan=3)
+        space=Label(self, bg=BRANCO)
+        space.grid(row=2, rowspan=3)
         
         button2 = Button(self, text="Adicionar funcionário",
-                            command=self.adicionar_funcionario,width=21)
-        button2.grid(row=5, column=1,sticky="w")
+                            command=lambda: self.controller.show_frame(Adicionar_funcionario_page), width=21)
+        button2.grid(row=5, column=1, sticky="w")
         
         button3 = Button(self, text="Editar funcionários",
-                            command=self.editar_funcionarios,width=21)
-        button3.grid(row=6, column=0,sticky="e")
+                            command=lambda: self.controller.tabela_funcionarios(), width=21)
+        button3.grid(row=6, column=0, sticky="e")
         
         button4 = Button(self, text="Comentários",
-                            command=self.comentarios,width=21)
-        button4.grid(row=6, column=1,sticky="w")
+                            command=lambda: self.controller.show_frame(Comentarios_page), width=21)
+        button4.grid(row=6, column=1, sticky="w")
         
         button5 = Button(self, text="sair",
-                            command=self.sair,width=4)
-        button5.grid(row=7, column=2,sticky="w")
-        
-    def sair(self,*args):
-        self.controller.show_frame(Login_page)
-        
-    def comentarios(self,*args):
-        self.controller.show_frame(Comentarios_page)
-        
-    def editar_funcionarios(self,*args):
-       self.controller.tabela_funcionarios()
+                            command=lambda: self.controller.show_frame(Login_page), width=4)
+        button5.grid(row=7, column=2, sticky="w")
 
-    def pontuacao(self,*args):
-       self.controller.show_frame(Pontuacao_page)
-        
-    def adicionar_funcionario(self,*args):
-        self.controller.show_frame(Adicionar_funcionario_page)
     
 class Login_page(Frame):
     
@@ -143,10 +148,10 @@ class Login_page(Frame):
     
     def __init__(self,parent,controller):
         self.controller=controller
-        Frame.__init__(self,parent)
-        self.label = Label(self, text="Log in", font=LARGE_FONT)
-        self.nomel = Label(self,text="Nome de usuário:", font="Verdana 10")
-        self.senhal = Label(self,text="Senha:", font="Verdana 10")
+        Frame.__init__(self,parent, bg=BRANCO)
+        self.label = Label(self, text="Log in", font=LARGE_FONT, bg=BRANCO)
+        self.nomel = Label(self,text="Nome de usuário:", font="Verdana 10", bg=BRANCO)
+        self.senhal = Label(self,text="Senha:", font="Verdana 10", bg=BRANCO)
         self.nome = Entry(self)
         self.senha = Entry(self,show="*")
         self.label.grid(row=0,column=0,columnspan=3,sticky="ew")
@@ -183,9 +188,9 @@ class Login_page(Frame):
 class Pontuacao_page(Frame):
     
     def __init__(self,parent,controller):
-        Frame.__init__(self,parent)
+        Frame.__init__(self,parent, bg=BRANCO)
         self.controller=controller
-        self.label = Label(self, text="Pontuação", font=LARGE_FONT)
+        self.label = Label(self, text="Pontuação", font=LARGE_FONT, bg=BRANCO)
         self.label.grid(row=0,column=0)
 
         self.button1 = Button(self, text="Voltar",
@@ -198,7 +203,10 @@ class Pontuacao_page(Frame):
         self.busca.grid(row=4,column=1)
         self.button2 = Button(self, text="procurar",font="verdana 8",
                             command=self.buscar)
-        self.button2.grid(row=4,column=2)
+        self.button2.grid(row=4,column=3)
+
+        self.scrollframe=ScrollFrame(self)
+        self.scrollframe.grid(row=1,column=1,columnspan=3)
     
     def sair(self,*args):
         self.busca.delete(0,'end')
@@ -207,30 +215,43 @@ class Pontuacao_page(Frame):
     def buscar(self,*args):
         print("busca por nome")
 
+    def editar_lista(self,*args):
+        lista = db_employee.getAllEmployees()
+
+        self.scrollframe.destroy()
+        self.scrollframe = ScrollFrame(self)
+        self.scrollframe.grid(row=1, column=1, columnspan=3)
+
+        for row in range(len(lista)):
+            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeName(), bg=BRANCO).grid(row=row, column=0)
+            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeEmail(), bg=BRANCO).grid(row=row, column=1)
+            Label(self.scrollframe.viewPort, text="Pontuação de"+lista[row].getEmployeeName(), bg=BRANCO)
+
+
 class Adicionar_funcionario_page(Frame):
     
     def __init__(self,parent,controller):
-        Frame.__init__(self,parent)
+        Frame.__init__(self,parent, bg=BRANCO)
         self.controller=controller
-        self.label = Label(self, text="Adicionar funcionário", font=LARGE_FONT)
+        self.label = Label(self, text="Adicionar funcionário", font=LARGE_FONT, bg=BRANCO)
         self.label.grid(row=0,column=0)
         
-        self.nomel=Label(self,text='Nome: ', font=LARGE_FONT)
+        self.nomel=Label(self,text='Nome: ', font=LARGE_FONT, bg=BRANCO)
         self.nome=Entry(self)
         self.nomel.grid(row=1,column=0)
         self.nome.grid(row=1,column=1)
         
-        self.emaill=Label(self,text='Email: ', font=LARGE_FONT)
+        self.emaill=Label(self,text='Email: ', font=LARGE_FONT, bg=BRANCO)
         self.email=Entry(self)
         self.emaill.grid(row=2,column=0)
         self.email.grid(row=2,column=1)
         
-        self.senhal=Label(self,text='Senha: ',font=LARGE_FONT)
+        self.senhal=Label(self,text='Senha: ',font=LARGE_FONT, bg=BRANCO)
         self.senha=Entry(self,show='*')
         self.senhal.grid(row=3,column=0)
         self.senha.grid(row=3,column=1)
         
-        self.adm=Checkbutton(self,text='Administrador')
+        self.adm=Checkbutton(self,text='Administrador', bg=BRANCO)
         self.adm.grid(row=4,column=0)
         
 
@@ -271,14 +292,14 @@ class Adicionar_funcionario_page(Frame):
 class Editar_funcionario_tabela_page(Frame):
     
     def __init__(self,parent,controller):
-        Frame.__init__(self,parent)
+        Frame.__init__(self,parent, bg=BRANCO)
         self.controller=controller
-        self.label = Label(self, text="Funcionários", font=LARGE_FONT)
+        self.label = Label(self, text="Funcionários", font=LARGE_FONT, bg=BRANCO)
         self.label.grid(row=0,column=0,columnspan=5)
         self.grid_columnconfigure(0,weight=1)
 
         self.button = Button(self, text="Voltar",
-                            command=self.voltar)
+                            command= lambda: self.controller.show_frame(Home_page))
         self.button.grid(row=4,column=5)
         
         self.button2= Button(self,text='procurar',
@@ -305,9 +326,6 @@ class Editar_funcionario_tabela_page(Frame):
             a=row
             Button(self.scrollframe.viewPort, text="editar", command=lambda x=a:
                                         self.controller.atualizar_usuario(lista[x].getEmployeeID())).grid(row=row, column=2)
-
-    def voltar(self,*args):
-        self.controller.show_frame(Home_page)
         
     def procurar(self,*args):
         print('procurar')
@@ -315,13 +333,13 @@ class Editar_funcionario_tabela_page(Frame):
 class Editar_funcionario_individual_page(Frame):
     
     def __init__(self,parent,controller):
-        Frame.__init__(self,parent)
+        Frame.__init__(self,parent, bg=BRANCO)
         self.controller=controller
         self.ID=None
-        self.label1 = Label(self, text="Editar usuáro", font=LARGE_FONT)
+        self.label1 = Label(self, text="Editar usuáro", font=LARGE_FONT, bg=BRANCO)
         self.label1.grid(row=0,column=0)
 
-        self.label2=Label(self,text="Nome:",font="verdano 10")
+        self.label2=Label(self,text="Nome:",font="verdano 10", bg=BRANCO)
         self.label2.grid(row=1,column=0)
 
         self.email=Entry(self)
@@ -370,9 +388,9 @@ class Editar_funcionario_individual_page(Frame):
 class Comentarios_page(Frame):
     
     def __init__(self,parent,controller):
-        Frame.__init__(self,parent)
+        Frame.__init__(self,parent, bg=BRANCO)
         self.controller=controller
-        self.label = Label(self, text="Comentários", font=LARGE_FONT)
+        self.label = Label(self, text="Comentários", font=LARGE_FONT, bg=BRANCO)
         self.label.grid(row=0, column=0, columnspan=5)
         self.grid_columnconfigure(0, weight=1)
 
@@ -393,8 +411,8 @@ class Comentarios_page(Frame):
 
     def editar_lista(self, *args):
         for row in range(len(comentarios)):
-            Label(self.scrollframe.viewPort, text=comentarios[row][0]).grid(row=row, column=0)
-            Label(self.scrollframe.viewPort, text=comentarios[row][1]).grid(row=row, column=1)
+            Label(self.scrollframe.viewPort, text=comentarios[row][0], bg=BRANCO).grid(row=row, column=0)
+            Label(self.scrollframe.viewPort, text=comentarios[row][1], bg=BRANCO).grid(row=row, column=1)
             a = row
             Button(self.scrollframe.viewPort, text="vizualizar", command=lambda x=a:
                         self.controller.mostrar_comentario(x)).grid(row=row, column=2)
