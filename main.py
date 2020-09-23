@@ -9,7 +9,6 @@ from tkinter import messagebox
 import importlib
 
 employee_class = importlib.import_module("classes.employee_class", ".")
-employee_class = importlib.import_module("classes.employee_class", ".")
 comment_class = importlib.import_module("classes.comment_class", ".")
 db_comment = importlib.import_module("db_access_offline.db_comment", ".")
 db_employee = importlib.import_module("db_access_offline.db_employee", ".")
@@ -261,7 +260,8 @@ class Adicionar_funcionario_page(Frame):
         self.senhal.grid(row=3, column=0)
         self.senha.grid(row=3, column=1)
 
-        self.adm = Checkbutton(self, text='Administrador', bg=BRANCO)
+        self.is_adm=IntVar()
+        self.adm = Checkbutton(self, text='Administrador', variable=self.is_adm, bg=BRANCO)
         self.adm.grid(row=4, column=0)
 
         self.button1 = Button(self, text="Voltar",
@@ -286,7 +286,7 @@ class Adicionar_funcionario_page(Frame):
                 messagebox.showinfo("Erro", "Informações faltando")
                 self.senha.delete(0, 'end')
             else:
-                db_employee.addEmployee(self.nome.get(), self.email.get(), "", "", "","")
+                db_employee.addEmployee(self.nome.get(), self.email.get(), self.senha.get(), self.is_adm.get(), 0, "path")
                 messagebox.showinfo("Ação completada", "Usuário adicionado com sucesso")
                 self.nome.delete(0, 'end')
                 self.email.delete(0, 'end')
