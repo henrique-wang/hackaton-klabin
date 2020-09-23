@@ -14,6 +14,7 @@ db_comment = importlib.import_module("db_access_offline.db_comment",".")
 db_employee = importlib.import_module("db_access_offline.db_employee",".")
 
 LARGE_FONT= ("Verdana", 12)
+STRONG_FONT=("verdana 12 bold")
 BRANCO="#fff"
 HOME=0
 LOGIN=1
@@ -40,15 +41,17 @@ class ScrollFrame(Frame):#https://gist.github.com/mp035/9f2027c3ef9172264532fcd6
         self.canvas = Canvas(self, borderwidth=0, background=BRANCO)          #place canvas on self
         self.viewPort = Frame(self.canvas, background=BRANCO)                    #place a frame on the canvas, this frame will hold the child widgets
         self.vsb = Scrollbar(self, orient="vertical", command=self.canvas.yview) #place a scrollbar on self
+        self.vsb2 = Scrollbar(self,orient="horizontal", command=self.canvas.xview)
         self.canvas.configure(yscrollcommand=self.vsb.set)                          #attach scrollbar action to scroll of canvas
+        self.canvas.configure(xscrollcommand=self.vsb2.set)
 
         self.vsb.pack(side="right", fill="y")                                       #pack scrollbar to right of self
+        self.vsb2.pack(side="bottom", fill="x")
         self.canvas.pack(side="left", fill="both", expand=True)                     #pack canvas to left of self and expand to fil
         self.canvas_window = self.canvas.create_window((4,4), window=self.viewPort, anchor="nw",            #add view port frame to canvas
                                   tags="self.viewPort")
 
         self.viewPort.bind("<Configure>", self.onFrameConfigure)                       #bind an event whenever the size of the viewPort frame changes.
-        self.canvas.bind("<Configure>", self.onCanvasConfigure)                       #bind an event whenever the size of the viewPort frame changes.
 
         self.onFrameConfigure(None)                                                 #perform an initial stretch on render, otherwise the scroll region has a tiny border until the first resize
 
@@ -56,10 +59,6 @@ class ScrollFrame(Frame):#https://gist.github.com/mp035/9f2027c3ef9172264532fcd6
         '''Reset the scroll region to encompass the inner frame'''
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))                 #whenever the size of the frame changes, alter the scroll region respectively.
 
-    def onCanvasConfigure(self, event):
-        '''Reset the canvas window to encompass inner frame when required'''
-        canvas_width = event.width
-        self.canvas.itemconfig(self.canvas_window, width = canvas_width)            #whenever the size of the canvas changes alter the window region respectively.
 
 
 class Window(Tk):
@@ -79,17 +78,19 @@ class Window(Tk):
         paginas=[Home_page, Login_page, Pontuacao_page, Adicionar_funcionario_page,
                   Editar_funcionario_tabela_page,Editar_funcionario_individual_page,Comentarios_page]
 
-        for F in (Home_page, Login_page, Pontuacao_page, Adicionar_funcionario_page,
-                  Editar_funcionario_tabela_page,Editar_funcionario_individual_page,Comentarios_page):
+        self.pagina=[]
+        for F in range(len(paginas)):
 
-            frame = F(container, self)
-
+            frame= ScrollFrame(container)
+            a=paginas[F](frame.viewPort,self)
+            a.grid(row=0,column=0)
+            self.pagina.append(a)
 
             self.frames[F] = frame
 
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(Login_page)
+        self.show_frame(LOGIN)
 
     def show_frame(self, cont):
 
@@ -97,19 +98,21 @@ class Window(Tk):
         frame.tkraise()
 
     def atualizar_usuario(self,ID):
-         self.frames[Editar_funcionario_individual_page].atualizar(ID)
-         self.show_frame(Editar_funcionario_individual_page)
+         self.pagina[FUNCIONARIO].atualizar(ID)
+         self.show_frame(FUNCIONARIO)
 
     def mostrar_comentario(self,ID):
-         print("mostrando comentario " + str(ID))
+        self.pagina[COMENTARIOS].editar_lista()
+        self.show_frame((COMENTARIOS))
+        print("mostrando comentario " + str(ID))
 
     def tabela_funcionarios(self):
-        self.frames[Editar_funcionario_tabela_page].editar_lista()
-        self.show_frame(Editar_funcionario_tabela_page)
+        self.pagina[FUNCIONARIOS].editar_lista()
+        self.show_frame(FUNCIONARIOS)
 
     def tabela_pontos(self):
-        self.frames[Pontuacao_page].editar_lista()
-        self.show_frame(Pontuacao_page)
+        self.pagina[PONTUACAO].editar_lista()
+        self.show_frame(PONTUACAO)
         
 class Home_page(Frame):
     def __init__(self, parent, controller):
@@ -128,7 +131,7 @@ class Home_page(Frame):
         space.grid(row=2, rowspan=3)
         
         button2 = Button(self, text="Adicionar funcionário",
-                            command=lambda: self.controller.show_frame(Adicionar_funcionario_page), width=21)
+                            command=lambda: self.controller.show_frame(ADICIONAR), width=21)
         button2.grid(row=5, column=1, sticky="w")
         
         button3 = Button(self, text="Editar funcionários",
@@ -136,18 +139,16 @@ class Home_page(Frame):
         button3.grid(row=6, column=0, sticky="e")
         
         button4 = Button(self, text="Comentários",
-                            command=lambda: self.controller.show_frame(Comentarios_page), width=21)
+                            command=lambda: self.controller.show_frame(COMENTARIOS), width=21)
         button4.grid(row=6, column=1, sticky="w")
         
         button5 = Button(self, text="sair",
-                            command=lambda: self.controller.show_frame(Login_page), width=4)
+                            command=lambda: self.controller.show_frame(LOGIN), width=4)
         button5.grid(row=7, column=2, sticky="w")
 
     
 class Login_page(Frame):
-    
-    
-    
+
     def __init__(self,parent,controller):
         self.controller=controller
         Frame.__init__(self,parent, bg=BRANCO)
@@ -177,10 +178,10 @@ class Login_page(Frame):
                 raise()
             self.nome.delete(0,'end')
             self.senha.delete(0,'end')
-            self.controller.show_frame(Home_page)
+            self.controller.show_frame(HOME)
         except:
             messagebox.showinfo("erro de login","usuário ou senha inválida")
-            self.controller.show_frame(Login_page)
+            self.controller.show_frame(LOGIN)
             self.nome.delete(0,'end')
             self.senha.delete(0,'end')
     
@@ -199,7 +200,7 @@ class Pontuacao_page(Frame):
                             command=self.sair)
         self.button1.grid(row=10,column=10)
         
-        self.buscal=Label(self,text="Procurar:",font="Verdana 8")
+        self.buscal=Label(self,text="Procurar:",font="Verdana 8",bg=BRANCO)
         self.buscal.grid(row=4,column=0)
         self.busca= Entry(self)
         self.busca.grid(row=4,column=1)
@@ -212,7 +213,7 @@ class Pontuacao_page(Frame):
     
     def sair(self,*args):
         self.busca.delete(0,'end')
-        self.controller.show_frame(Home_page)
+        self.controller.show_frame(HOME)
         
     def buscar(self,*args):
         print("busca por nome")
@@ -223,11 +224,14 @@ class Pontuacao_page(Frame):
         self.scrollframe.destroy()
         self.scrollframe = ScrollFrame(self)
         self.scrollframe.grid(row=1, column=1, columnspan=3)
+        Label(self.scrollframe.viewPort,text="Nome", font=STRONG_FONT,bg=BRANCO).grid(row=0,column=0)
+        Label(self.scrollframe.viewPort,text="Email", font=STRONG_FONT,bg=BRANCO).grid(row=0,column=1)
+        Label(self.scrollframe.viewPort,text="Pontuação", font=STRONG_FONT,bg=BRANCO).grid(row=0,column=2)
 
         for row in range(len(lista)):
-            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeName(), bg=BRANCO).grid(row=row, column=0)
-            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeEmail(), bg=BRANCO).grid(row=row, column=1)
-            Label(self.scrollframe.viewPort, text="Pontuação de"+lista[row].getEmployeeName(), bg=BRANCO)
+            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeName(), bg=BRANCO).grid(row=row+1, column=0)
+            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeEmail(), bg=BRANCO).grid(row=row+1, column=1)
+            Label(self.scrollframe.viewPort, text=str(lista[row].getScore()), bg=BRANCO).grid(row=row+1, column=2)
 
 
 class Adicionar_funcionario_page(Frame):
@@ -270,7 +274,7 @@ class Adicionar_funcionario_page(Frame):
         self.email.delete(0, 'end')
         self.senha.delete(0, 'end')
         self.adm.deselect()
-        self.controller.show_frame(Home_page)
+        self.controller.show_frame(HOME)
     
     def confirmar(self,*args):
         print("adicionar senha")
@@ -301,13 +305,15 @@ class Editar_funcionario_tabela_page(Frame):
         self.grid_columnconfigure(0,weight=1)
 
         self.button = Button(self, text="Voltar",
-                            command= lambda: self.controller.show_frame(Home_page))
+                            command= lambda: self.controller.show_frame(HOME))
         self.button.grid(row=4,column=5)
         
         self.button2= Button(self,text='procurar',
                              command=self.procurar)
         self.button2.grid(row=4,column=3)
-        
+
+        self.procural= Label(self, text="Procurar", bg=BRANCO).grid(row=4,column=0)
+
         self.procura=Entry(self)
         self.procura.grid(row=4,column=1)
 
@@ -321,13 +327,15 @@ class Editar_funcionario_tabela_page(Frame):
         self.scrollframe.destroy()
         self.scrollframe = ScrollFrame(self)
         self.scrollframe.grid(row=1, column=1, columnspan=5)
+        Label(self.scrollframe.viewPort,text="Nome", font=STRONG_FONT,bg=BRANCO).grid(row=0,column=0)
+        Label(self.scrollframe.viewPort,text="Email", font=STRONG_FONT,bg=BRANCO).grid(row=0,column=1)
 
         for row in range(len(lista)):
-            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeName()).grid(row=row, column=0)
-            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeEmail()).grid(row=row, column=1)
+            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeName()).grid(row=row+1, column=0)
+            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeEmail()).grid(row=row+1, column=1)
             a=row
             Button(self.scrollframe.viewPort, text="editar", command=lambda x=a:
-                                        self.controller.atualizar_usuario(lista[x].getEmployeeID())).grid(row=row, column=2)
+                                        self.controller.atualizar_usuario(lista[x].getEmployeeID())).grid(row=row+1, column=2)
         
     def procurar(self,*args):
         print('procurar')
@@ -397,12 +405,14 @@ class Comentarios_page(Frame):
         self.grid_columnconfigure(0, weight=1)
 
         self.button1 = Button(self, text="Voltar",
-                             command=self.voltar)
+                              command=self.voltar)
         self.button1.grid(row=4, column=5)
 
         self.button2 = Button(self, text='procurar',
                               command=self.procurar)
         self.button2.grid(row=4, column=3)
+
+        self.procural= Label(self, text="Procurar", bg=BRANCO).grid(row=4,column=0)
 
         self.procura = Entry(self)
         self.procura.grid(row=4, column=1)
@@ -412,16 +422,24 @@ class Comentarios_page(Frame):
         self.editar_lista()
 
     def editar_lista(self, *args):
-        for row in range(len(comentarios)):
-            Label(self.scrollframe.viewPort, text=comentarios[row][0], bg=BRANCO).grid(row=row, column=0)
-            Label(self.scrollframe.viewPort, text=comentarios[row][1], bg=BRANCO).grid(row=row, column=1)
+        lista=db_comment.getAllComments()
+
+        self.scrollframe.destroy()
+        self.scrollframe = ScrollFrame(self)
+        self.scrollframe.grid(row=1, column=1, columnspan=5)
+        Label(self.scrollframe.viewPort,text="Data", font=STRONG_FONT,bg=BRANCO).grid(row=0,column=0)
+        Label(self.scrollframe.viewPort,text="Área", font=STRONG_FONT,bg=BRANCO).grid(row=0,column=1)
+
+        for row in range(len(lista)):
+            Label(self.scrollframe.viewPort, text=lista[row].getDate(), bg=BRANCO).grid(row=row+1, column=0)
+            Label(self.scrollframe.viewPort, text=lista[row].getArea(), bg=BRANCO).grid(row=row+1, column=1)
             a = row
             Button(self.scrollframe.viewPort, text="vizualizar", command=lambda x=a:
-                        self.controller.mostrar_comentario(x)).grid(row=row, column=2)
+                        self.controller.mostrar_comentario(x)).grid(row=row+1, column=2,sticky="e")
 
     def voltar(self, *args):
         self.procura.delete(0,'end')
-        self.controller.show_frame(Home_page)
+        self.controller.show_frame(HOME)
 
     def procurar(self, *args):
         print('procurar')
