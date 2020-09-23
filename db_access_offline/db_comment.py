@@ -7,13 +7,13 @@ employee_class = importlib.import_module("classes.employee_class", ".")
 
 # Add comment in database
 # Receive String comment, int employeeID
-def addComment(employeeID, comment, area):
+def addComment(employeeID, comment, area, smile):
     dataBase = pd.read_csv('./db_access_offline/employee_comments_db.csv')
     commentID = getNewCommentID()
     today = date.today()
     messageDate = today.strftime("%d/%m/%y")     # dd/mm/YY
     newData = [{'idcom': commentID, 'idemp': employeeID, 'date': messageDate, 'comment': comment,
-                    'score': 0, 'area': area}]
+                    'score': 0, 'area': area, 'smile': smile}]
     dataBase = dataBase.append(newData, ignore_index=True)
     dataBase.to_csv('./db_access_offline/employee_comments_db.csv', index=False)
 
@@ -38,7 +38,9 @@ def getAllComments():
         curr_comment = dataBase["comment"][i]
         curr_point = dataBase["score"][i]
         curr_area = dataBase["area"][i]
-        comment = comment_class.Comment(curr_employee_id, curr_data, curr_comment, curr_idcom, curr_area, curr_point)
+        curr_smile = dataBase["smile"][i]
+        comment = comment_class.Comment(curr_employee_id, curr_data, curr_comment, curr_idcom, curr_area, curr_point,
+                                        curr_smile)
         comment_list.append(comment)
     return comment_list
 
@@ -59,7 +61,9 @@ def getCommentsPerDate(first_date, last_date):
             curr_comment = dataBase["comment"][i]
             curr_point = dataBase["score"][i]
             curr_area = dataBase["area"][i]
-            comment = comment_class.Comment(curr_employee_id, curr_data, curr_comment, curr_idcom, curr_area, curr_point)
+            curr_smile = dataBase["smile"][i]
+            comment = comment_class.Comment(curr_employee_id, curr_data, curr_comment, curr_idcom, curr_area, curr_point,
+                                            curr_smile)
             comment_list.append(comment)
     return comment_list
 
@@ -79,7 +83,9 @@ def getCommentsPerEmployee(employee):
             curr_comment = dataBase["comment"][i]
             curr_point = dataBase["score"][i]
             curr_area = dataBase["area"][i]
-            comment = comment_class.Comment(curr_employee_id, curr_data, curr_comment, curr_idcom, curr_area, curr_point)
+            curr_smile = dataBase["smile"][i]
+            comment = comment_class.Comment(curr_employee_id, curr_data, curr_comment, curr_idcom, curr_area, curr_point,
+                                            curr_smile)
             comment_list.append(comment)
 
     return comment_list
@@ -104,8 +110,8 @@ def setPointForComment(comID, newPoint):
 def main():
     dataBase = pd.read_csv('employee_comments_db.csv')
     comments = getAllComments()
-    #for comment in comments:
-    #    print(comment)
+    for comment in comments:
+        print(comment)
     #addComment(1, "funcionou!", "bamoo")
     #print(dataBase)
     #first_date = '19/09/19'

@@ -292,6 +292,7 @@ class Adicionar_funcionario_page(Frame):
                 self.email.delete(0, 'end')
                 self.senha.delete(0, 'end')
                 self.adm.deselect()
+                # Pegar id do novo usuário e colocar como entrada no TakePicture()
                 picture_taker.TakePicture()
                 trainer.Train()
                 recognizer.Recognize()
