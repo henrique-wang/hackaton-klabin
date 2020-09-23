@@ -9,7 +9,7 @@ employee_class = importlib.import_module("classes.employee_class", ".")
 # Get all employees from database
 # Return List<Employee>
 def getAllEmployees():
-    dataBase = pd.read_csv('employee_db.csv')
+    dataBase = pd.read_csv('./db_access_offline/employee_db.csv')
     print(dataBase)
     employee_list = []
     for i in range(len(dataBase)):
@@ -29,7 +29,7 @@ def getAllEmployees():
 # Receive String userEmail
 # Return Employee
 def getEmployeePerEmail(userEmail):
-    dataBase = pd.read_csv('employee_db.csv')
+    dataBase = pd.read_csv('./db_access_offline/employee_db.csv')
     for i in range(len(dataBase)):
         employee_email = dataBase["email"][i]
         if (employee_email == userEmail):
@@ -49,7 +49,7 @@ def getEmployeePerEmail(userEmail):
 # Return Employee userID was found
 # Return False if it wasn't
 def getEmployeePerID(userID):
-    dataBase = pd.read_csv('employee_db.csv')
+    dataBase = pd.read_csv('./db_access_offline/employee_db.csv')
     for i in range(len(dataBase)):
         employee_id = dataBase["idemp"][i]
         if (employee_id == userID):
@@ -69,14 +69,14 @@ def getEmployeePerID(userID):
 # Return True if it has been changed
 # Return False, if it hasn't
 def setEmployeeName(userID, newName):
-    dataBase = pd.read_csv('employee_db.csv')
+    dataBase = pd.read_csv('./db_access_offline/employee_db.csv')
     for i in range(len(dataBase)):
         employee_id = dataBase["idemp"][i]
         if (employee_id == userID):
             # Change Employee Name
             dataBase["first_name"][i] = newName
             # Save new value
-            dataBase.to_csv('./employee_db.csv', index=False)
+            dataBase.to_csv('./db_access_offline/employee_db.csv', index=False)
             return True
     # UserID not found
     return False
@@ -86,14 +86,14 @@ def setEmployeeName(userID, newName):
 # Return True if it has been changed
 # Return False, if it hasn't
 def setEmployeeEmail(userID, newEmail):
-    dataBase = pd.read_csv('employee_db.csv')
+    dataBase = pd.read_csv('./db_access_offline/employee_db.csv')
     for i in range(len(dataBase)):
         employee_id = dataBase["idemp"][i]
         if (employee_id == userID):
             # Change Employee Email
             dataBase["email"][i] = newEmail
             # Save new value
-            dataBase.to_csv('./employee_db.csv', index=False)
+            dataBase.to_csv('./db_access_offline/employee_db.csv', index=False)
             return True
     # UserID not found
     return False
@@ -104,7 +104,7 @@ def setEmployeeEmail(userID, newEmail):
 # Return False if he wasn't
 def deleteEmployee(userID):
     userIDfound = False
-    dataBase = pd.read_csv('employee_db.csv')
+    dataBase = pd.read_csv('./db_access_offline/employee_db.csv')
     newDB = pd.DataFrame(columns=['idemp', 'first_name', 'email'])
     for i in range(len(dataBase)):
         employee_id = dataBase["idemp"][i]
@@ -120,7 +120,7 @@ def deleteEmployee(userID):
             newDB = newDB.append(newData, ignore_index=True)
         if (employee_id == userID):
             userIDfound = True
-    newDB.to_csv('./employee_db.csv', index=False)
+    newDB.to_csv('./db_access_offline/employee_db.csv', index=False)
     return userIDfound
 
 # Add employee corresponding for userID in database
@@ -128,7 +128,7 @@ def deleteEmployee(userID):
 # Return True if he was added
 # Return False if he wasn't
 def addEmployee(userName, userEmail, employee_password, employee_isAdmin, employee_score, employee_path):
-    dataBase = pd.read_csv('employee_db.csv')
+    dataBase = pd.read_csv('./db_access_offline/employee_db.csv')
     userEmailAvailable = emailAvailable(userEmail)
     if (userEmailAvailable):
         employee_id = getNewEmployeeID()
@@ -136,7 +136,7 @@ def addEmployee(userName, userEmail, employee_password, employee_isAdmin, employ
             {'idemp': employee_id, 'first_name': userName, 'email': userEmail, "password": employee_password,
              'isadmin': employee_isAdmin, 'score': employee_score, 'photo_path': employee_path}]
         dataBase = dataBase.append(newData, ignore_index=True)
-        dataBase.to_csv('./employee_db.csv', index=False)
+        dataBase.to_csv('./db_access_offline/employee_db.csv', index=False)
         return True
     else:
         return False
@@ -144,7 +144,7 @@ def addEmployee(userName, userEmail, employee_password, employee_isAdmin, employ
 # Get the next employeeID available in database
 # Return int lastUsedID
 def getNewEmployeeID():
-    dataBase = pd.read_csv('employee_db.csv')
+    dataBase = pd.read_csv('./db_access_offline/employee_db.csv')
     employeeNum = len(dataBase)
     lastUsedID = dataBase["idemp"][employeeNum - 1]
     return lastUsedID + 1
@@ -154,13 +154,14 @@ def getNewEmployeeID():
 # Return True if it is available
 # Return False it is not
 def emailAvailable(email):
-    dataBase = pd.read_csv('employee_db.csv')
+    dataBase = pd.read_csv('./db_access_offline/employee_db.csv')
     for i in range(len(dataBase)):
         currEmail = dataBase["email"][i]
         if (currEmail == email):
             return False
     return True
 
+"""
 def main():
     employeesList = getAllEmployees()
     #for employee in employeesList:
@@ -172,3 +173,4 @@ def main():
     #deleteEmployee(2)
     #print(pd.read_csv('employee_db.csv'))
 main()
+"""
