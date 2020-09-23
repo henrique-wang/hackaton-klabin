@@ -11,6 +11,7 @@ def count_appearance(id):
     df.to_csv(user_dir, index=False)
 
 def count_smile(id):
+
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     user_dir = os.path.join(BASE_DIR, "users.csv")
     df = pd.read_csv(user_dir)
@@ -21,22 +22,21 @@ def Recognize():
 
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     cascade_dir = os.path.join(BASE_DIR, "cascades/haarcascade_frontalface_default.xml")
-    smile_dir = os.path.join(BASE_DIR, "cascades/haarcascade_smile.xml")
-    trainer_dir = os.path.join(BASE_DIR, "trainer/trainer.yml")
-
-
-    recognizer = cv2.face.LBPHFaceRecognizer_create()
-
-    recognizer.read(trainer_dir)
     faceCascade = cv2.CascadeClassifier(cascade_dir)
+
+    smile_dir = os.path.join(BASE_DIR, "cascades/haarcascade_smile.xml")
     smile_cascade = cv2.CascadeClassifier(smile_dir)
+
+    trainer_dir = os.path.join(BASE_DIR, "trainer/trainer.yml")
+    recognizer = cv2.face.LBPHFaceRecognizer_create()
+    recognizer.read(trainer_dir)
 
     font = cv2.FONT_HERSHEY_SIMPLEX
     # init id counter
     id_counter = 0
 
     # names related to ids: example ==> Marcelo: id=1,  etc
-    user_dir=os.path.join(BASE_DIR, "users.csv")
+    user_dir = os.path.join(BASE_DIR, "users.csv")
     df = pd.read_csv(user_dir)
     names = df['Name'].tolist()
     # Initialize and start realtime video capture
