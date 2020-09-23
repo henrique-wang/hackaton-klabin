@@ -13,6 +13,9 @@ employee_class = importlib.import_module("classes.employee_class", ".")
 comment_class = importlib.import_module("classes.comment_class", ".")
 db_comment = importlib.import_module("db_access_offline.db_comment", ".")
 db_employee = importlib.import_module("db_access_offline.db_employee", ".")
+picture_taker = importlib.import_module("Codigo_Guigs.1_TakePictures",".")
+trainer = importlib.import_module("Codigo_Guigs.2_TrainModel")
+recognizer = importlib.import_module("Codigo_Guigs.3_Recognizer")
 
 LARGE_FONT = ("Verdana", 12)
 STRONG_FONT = ("verdana 12 bold")
@@ -289,6 +292,10 @@ class Adicionar_funcionario_page(Frame):
                 self.email.delete(0, 'end')
                 self.senha.delete(0, 'end')
                 self.adm.deselect()
+                picture_taker.TakePicture()
+                trainer.Train()
+                recognizer.Recognize()
+
         else:
             messagebox.showinfo("Erro", "Email já em uso")
             self.email.delete(0, 'end')
