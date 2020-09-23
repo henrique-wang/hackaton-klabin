@@ -8,6 +8,8 @@ Created on Tue Sep 22 18:29:44 2020
 from datetime import datetime
 from datetime import date
 import importlib
+#from employee_class import *
+#from comment_class import *
 employee_class = importlib.import_module("classes.employee_class", ".")
 comment_class = importlib.import_module("classes.comment_class", ".")
 
@@ -29,11 +31,15 @@ def db_2_comment(item):
     return comment
     
 def db_2_employee(item):  
-    employee = employee_class.Employee(item[1],item[2],item[3],item[6],item[5],item[0],item[4])
+    employee = employee_class.Employee(item[1],item[2],item[3],item[6],item[5],item[0],item[4],item[7])
     return employee
 
 #DATABASE EMPLOYEES (users)
-################################################################################
+############################################################
+
+#iduser##name##email##password##path##admin##score##howmany#
+
+############################################################
 #FROM INTERFACE TO DB
 def employee_2_db(employee):
     #colocar informação de outra colunas
@@ -41,7 +47,7 @@ def employee_2_db(employee):
     values = "("+str(employee.getEmployeeID())+",'"+employee.getEmployeeName()\
         +"','"+employee.getEmployeeEmail()+"','"+employee.getPassword()+"','"\
         +employee.getPhotoPath()+"',"+str(employee.getIsAdmin())+","\
-            +str(employee.getScore())+")"
+            +str(employee.getScore())+","+str(employee.getHowMany())+")"
     
     query = "INSERT INTO users VALUES " + values + ";"
     
@@ -49,11 +55,19 @@ def employee_2_db(employee):
     
     db.commit()
     
+    query = "SELECT iduser FROM users WHERE email = '"+employee.getEmployeeEmail()+"'"
+    cursor.execute(query)
+    
+    id_retorno = cursor.fetchall()
+    
+    return id_retorno[0][0]
+    
 def update_employee_db(employee):
     where = "iduser = " + str(employee.getEmployeeID())
     update = "name='"+employee.getEmployeeName()+"',email='"+employee.getEmployeeEmail()\
         +"',password='"+employee.getPassword()+"',path='"+employee.getPhotoPath()\
-            +"',admin="+str(employee.getIsAdmin())+",score="+str(employee.getScore())
+            +"',admin="+str(employee.getIsAdmin())+",score="+str(employee.getScore())+",howmany="\
+                +str(employee.getHowMany())
     query = "UPDATE users SET " + update + " WHERE " + where
     
     cursor.execute(query)
@@ -95,6 +109,19 @@ def show_employee_name_order(): #dos usuarios
         list_employee.append(db_2_employee(item))
     
     return list_employee
+
+##PRO GUIGSU
+def show_only_name_by_id():
+    query = "SELECT name FROM users ORDER BY iduser"
+    
+    cursor.execute(query)
+    table = cursor.fetchall()
+    lista_name = []
+    for item in table:
+        lista_name.append(item[0])
+        
+    return lista_name
+    
     
 def fetch_by_id(iduser):
     query = "SELECT * FROM users WHERE iduser = " + str(iduser)
@@ -119,6 +146,9 @@ def fetch_by_email(email):
     return employee
 
 #DATABASE COMMENTS (comments)
+
+#idcom##iduser##date##comment##area##score##smile#
+
 ################################################################################
 def comment_2_db(comment):
     #colocar informação de outra colunas
@@ -213,8 +243,3 @@ def show_comment_area_order():
         lista.append(db_2_comment(item))
         
     return lista
-
-
-
-
-
