@@ -1,5 +1,4 @@
 idemp,first_name,email,password,isadmin,score,photo_path
 0,luna,lunaa,asd123,1.0,2.0,'/path/to'
 1,pikachu,pikachu@gmail.com,pikapika,0.0,99.0,'/path/to'
-2,fd,fsd,,,,
-3,a,a,,,,
+2,b,b,b,0.0,0.0,path
