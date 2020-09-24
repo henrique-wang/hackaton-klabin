@@ -18,6 +18,8 @@ def count_smile(id):
     df.iat[id-1,3] +=1
     df.to_csv(user_dir, index=False)
 
+
+# We need to get the Name list of the users organized by ID
 def Recognize():
 
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -32,14 +34,18 @@ def Recognize():
     recognizer.read(trainer_dir)
 
     font = cv2.FONT_HERSHEY_SIMPLEX
+
     # init id counter
     id_counter = 0
 
-    # names related to ids: example ==> Marcelo: id=1,  etc
+    # Let's get the names
     user_dir = os.path.join(BASE_DIR, "users.csv")
     df = pd.read_csv(user_dir)
+    ids = df['Id'].tolist()
     names = df['Name'].tolist()
-    # Initialize and start realtime video capture
+    names_dict = dict(zip(ids, names))
+
+    # Initialize and start real time video capture
     cam = cv2.VideoCapture(0)
     cam.set(3, 640)  # set video widht
     cam.set(4, 480)  # set video height
@@ -47,8 +53,10 @@ def Recognize():
     minW = 0.2 * cam.get(3)
     minH = 0.2 * cam.get(4)
 
-    flag_appearance=[0]*len(names)
-    flag_smile=[0]*len(names)
+    zeros = [0]*len(names)
+    flag_appearance = dict(zip(ids, zeros))
+    flag_smiles = dict(zip(ids, zeros))
+
 
     # Let's start the loop
     while True:
@@ -69,19 +77,19 @@ def Recognize():
             roi_gray = gray[y:y + h, x:x + w]
             roi_color = img[y:y + h, x:x + w]
             smiles = smile_cascade.detectMultiScale(roi_gray, 1.85, 20, minSize=(5,5))
+
             for (sx, sy, sw, sh) in smiles:
                 cv2.rectangle(roi_color, (sx, sy), ((sx + sw), (sy + sh)), (0, 0, 255), 3)
-                if flag_smile[id_counter-1]==0:
-                    count_smile(id_counter)
-                    flag_smile[id_counter-1]=1
+                if flag_smiles.get(id_counter)==0:
+                    flag_smiles[id_counter]+=1
 
             # If we find a match
             if confidence > 70:
-                id = names[id_counter - 1]
+                id = names_dict.get(id_counter)
                 confidence = "  {0}%".format(round(confidence))
-                if flag_appearance[id_counter-1]==0:
-                    count_appearance(id_counter)
-                    flag_appearance[id_counter-1]=1
+                if flag_appearance.get(id_counter)==0:
+                    flag_appearance[id_counter]+=1
+
 
             # If we cannot identify the person
             else:
@@ -99,4 +107,8 @@ def Recognize():
     print("\n [INFO] Exiting Program and cleanup stuff")
     cam.release()
     cv2.destroyAllWindows()
+    IDs_of_Appearance = [key for (key, value) in flag_appearance.items() if value == 1]
+    IDs_of_Smile = [key for (key, value) in flag_smiles.items() if value == 1]
+    print(IDs_of_Appearance, IDs_of_Smile)
+    return IDs_of_Appearance, IDs_of_Smile
 

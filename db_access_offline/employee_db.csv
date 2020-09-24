@@ -1,3 +1,5 @@
 iduser,name,email,password,admin,score,path,howmany
 0,luna,lunaa,asd123,1.0,2.0,'/path/to',1
 1,pikachu,pikachu@gmail.com,pikapika,0.0,99.0,'/path/to',99
+2,asd,wewe,132,0.0,0.0,path,0
+3,ghj,dfgd,wer,0.0,0.0,path,0
