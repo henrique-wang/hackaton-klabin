@@ -125,7 +125,8 @@ def show_only_name_with_id():
     return lista_id,lista_name
     
     
-def fetch_by_id(iduser):
+def fetch_employee_by_id(iduser):
+
     query = "SELECT * FROM users WHERE iduser = " + str(iduser)
     
     cursor.execute(query)
@@ -136,7 +137,9 @@ def fetch_by_id(iduser):
     
     return employee
 
-def fetch_by_email(email):
+
+def fetch_employee_by_email(email):
+
     query = "SELECT * FROM users WHERE iduser = '" + email + "'"
     
     cursor.execute(query)
@@ -243,3 +246,14 @@ def show_comment_area_order():
         lista.append(db_2_comment(item))
         
     return lista
+
+def fetch_comment_by_id(idcom):
+    query = "SELECT * FROM comments WHERE idcom = " + str(idcom)
+    
+    cursor.execute(query)
+    
+    table = cursor.fetchall()
+    
+    employee = db_2_comment(table[0])
+    
+    return employee
