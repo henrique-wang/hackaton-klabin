@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import os
 import pandas as pd
+import pyttsx3
 
 def count_appearance(id):
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -21,6 +22,7 @@ def count_smile(id):
 
 # We need to get the Name list of the users organized by ID
 def Recognize():
+    engine = pyttsx3.init()
 
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     cascade_dir = os.path.join(BASE_DIR, "cascades/haarcascade_frontalface_default.xml")
@@ -81,6 +83,9 @@ def Recognize():
             for (sx, sy, sw, sh) in smiles:
                 cv2.rectangle(roi_color, (sx, sy), ((sx + sw), (sy + sh)), (0, 0, 255), 3)
                 if flag_smiles.get(id_counter)==0:
+                    text=('Belo sorriso'+names_dict.get(id_counter))
+                    engine.say(text)
+                    engine.runAndWait()
                     flag_smiles[id_counter]+=1
 
             # If we find a match
@@ -88,6 +93,9 @@ def Recognize():
                 id = names_dict.get(id_counter)
                 confidence = "  {0}%".format(round(confidence))
                 if flag_appearance.get(id_counter)==0:
+                    text=('Olá'+names_dict.get(id_counter))
+                    engine.say(text)
+                    engine.runAndWait()
                     flag_appearance[id_counter]+=1
 
 
