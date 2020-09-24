@@ -69,5 +69,5 @@ def TakePicture():
     print("\n [INFO] Exiting Program and cleanup stuff")
     cam.release()
     cv2.destroyAllWindows()
-    print(NEW_DIR)
+    return (NEW_DIR)
 

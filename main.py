@@ -35,7 +35,6 @@ banco de dados de comentarios:idcom|iduser|data|comment|score|area
 '''
 
 adm = {"a": ""}
-comentarios = [["a", "b"]]
 
 
 class ScrollFrame(Frame):  # https://gist.github.com/mp035/9f2027c3ef9172264532fcd6262f3b01 by mp035
@@ -148,9 +147,17 @@ class Home_page(Frame):
                          command=lambda: self.controller.show_frame(COMENTARIOS), width=21)
         button4.grid(row=6, column=1, sticky="w")
 
+        button6 = Button(self, text="Treinar",
+                         command=lambda: trainer.Train())
+        button6.grid(row=7, column=0, sticky="e")
+
+        button7 = Button(self, text="Testar",
+                         command=lambda: recognizer.Recognize())
+        button7.grid(row=7,column=1, sticky="w")
+
         button5 = Button(self, text="sair",
                          command=lambda: self.controller.show_frame(LOGIN), width=4)
-        button5.grid(row=7, column=2, sticky="w")
+        button5.grid(row=8, column=2, sticky="w")
 
 
 class Login_page(Frame):
@@ -159,7 +166,7 @@ class Login_page(Frame):
         self.controller = controller
         Frame.__init__(self, parent, bg=BRANCO)
         self.label = Label(self, text="Log in", font=LARGE_FONT, bg=BRANCO)
-        self.nomel = Label(self, text="Nome de usuário:", font="Verdana 10", bg=BRANCO)
+        self.nomel = Label(self, text="Email do usuário:", font="Verdana 10", bg=BRANCO)
         self.senhal = Label(self, text="Senha:", font="Verdana 10", bg=BRANCO)
         self.nome = Entry(self)
         self.senha = Entry(self, show="*")
@@ -176,10 +183,13 @@ class Login_page(Frame):
         self.button.grid(row=3, column=2)
 
     def testar(self, *args):
+        mail = self.nome.get()
+        password = self.senha.get()
+        usuario = db_employee.getEmployeePerEmail(mail)
+        print(usuario)
+
         try:
-            ID = self.nome.get()
-            password = self.senha.get()
-            if adm[ID] != password:
+            if usuario.getPassword() != password and not(usuario.getIsAdmin()):
                 raise ()
             self.nome.delete(0, 'end')
             self.senha.delete(0, 'end')
@@ -286,6 +296,7 @@ class Adicionar_funcionario_page(Frame):
                 messagebox.showinfo("Erro", "Informações faltando")
                 self.senha.delete(0, 'end')
             else:
+
                 db_employee.addEmployee(self.nome.get(), self.email.get(), self.senha.get(), self.is_adm.get(), 0, "path")
                 messagebox.showinfo("Ação completada", "Usuário adicionado com sucesso")
                 self.nome.delete(0, 'end')
@@ -294,8 +305,8 @@ class Adicionar_funcionario_page(Frame):
                 self.adm.deselect()
                 # Pegar id do novo usuário e colocar como entrada no TakePicture()
                 picture_taker.TakePicture()
-                trainer.Train()
-                recognizer.Recognize()
+
+
 
         else:
             messagebox.showinfo("Erro", "Email já em uso")
