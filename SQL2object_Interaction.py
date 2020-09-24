@@ -111,16 +111,18 @@ def show_employee_name_order(): #dos usuarios
     return list_employee
 
 ##PRO GUIGSU
-def show_only_name_by_id():
-    query = "SELECT name FROM users ORDER BY iduser"
+def show_only_name_with_id():
+    query = "SELECT iduser, name FROM users ORDER BY iduser"
     
     cursor.execute(query)
     table = cursor.fetchall()
+    lista_id = []
     lista_name = []
     for item in table:
-        lista_name.append(item[0])
+        lista_id.append(item[0])
+        lista_name.append(item[1])
         
-    return lista_name
+    return lista_id,lista_name
     
     
 def fetch_by_id(iduser):
@@ -207,8 +209,6 @@ def show_comment_iduser_order(): #dos usuarios
     cursor.execute(query)
     
     table = cursor.fetchall()
-    
-    print(table)
     
     lista = []
     
