@@ -149,7 +149,7 @@ def fetch_employee_by_id(iduser):
 
 
 def fetch_employee_by_email(email):
-    query = "SELECT * FROM users WHERE iduser = '" + email + "'"
+    query = "SELECT * FROM users WHERE email = '" + email + "'"
 
     cursor.execute(query)
 
@@ -158,6 +158,20 @@ def fetch_employee_by_email(email):
     employee = db_2_employee(table[0])
 
     return employee
+
+
+def fetch_email_if_exist(email):
+
+    query = "SELECT * FROM users WHERE email = '" + email + "'"
+
+    cursor.execute(query)
+
+    table = cursor.fetchall()
+
+    if len(table)==0:
+        return True
+    else:
+        return False
 
 
 # DATABASE COMMENTS (comments)
@@ -196,7 +210,7 @@ def update_comment_db(comment):
     db.commit()
 
 
-def delete_employee_db(comment):
+def delete_comment_db(comment):
     query = "DELETE FROM comments WHERE idcom = " + str(comment.getCommentID())
 
     cursor.execute(query)

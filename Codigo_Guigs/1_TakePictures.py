@@ -1,23 +1,9 @@
 import cv2
 import os
 
-def newUser(id):
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    user_dir = os.path.join(BASE_DIR, 'users.csv')
-    print(user_dir)
 
-    with open(user_dir,'r+') as f:
-        DataList=f.readlines()
-        idList=[]
-        for line in DataList:
-            entry=line.split(',')
-            idList.append(entry[0])
-        if id not in idList:
-            print("\n [INFO] Creating a new User ...")
-            username=input('\n enter username and press <return> ==>  ')
-            f.writelines(f'\n{id},{username},0,0')
 
-def TakePicture():
+def TakePicture(face_id):
 
     cam = cv2.VideoCapture(0)
     cam.set(3, 640)  # set video width
@@ -27,9 +13,7 @@ def TakePicture():
     print(cascade_dir)
     face_detector = cv2.CascadeClassifier(cascade_dir)
 
-    # For each person, enter one numeric face id
-    face_id = input('\n enter user id and press <return> ==>  ')
-    newUser(face_id)
+
     print("\n [INFO] Initializing face capture. Look the camera and wait ...")
     # Initialize individual sampling face count
     count = 0

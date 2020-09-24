@@ -3,24 +3,11 @@ import numpy as np
 import os
 import pandas as pd
 
-def count_appearance(id):
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    user_dir = os.path.join(BASE_DIR, "users.csv")
-    df = pd.read_csv(user_dir)
-    df.iat[id-1,2] +=1
-    df.to_csv(user_dir, index=False)
 
-def count_smile(id):
-
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    user_dir = os.path.join(BASE_DIR, "users.csv")
-    df = pd.read_csv(user_dir)
-    df.iat[id-1,3] +=1
-    df.to_csv(user_dir, index=False)
 
 
 # We need to get the Name list of the users organized by ID
-def Recognize():
+def Recognize(list_id,list_name):
 
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     cascade_dir = os.path.join(BASE_DIR, "cascades/haarcascade_frontalface_default.xml")
@@ -39,10 +26,8 @@ def Recognize():
     id_counter = 0
 
     # Let's get the names
-    user_dir = os.path.join(BASE_DIR, "users.csv")
-    df = pd.read_csv(user_dir)
-    ids = df['Id'].tolist()
-    names = df['Name'].tolist()
+    ids = list_id
+    names = list_name
     names_dict = dict(zip(ids, names))
 
     # Initialize and start real time video capture

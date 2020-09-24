@@ -10,11 +10,12 @@ import importlib
 
 employee_class = importlib.import_module("classes.employee_class", ".")
 comment_class = importlib.import_module("classes.comment_class", ".")
-db_comment = importlib.import_module("db_access_offline.db_comment", ".")
-db_employee = importlib.import_module("db_access_offline.db_employee", ".")
+#db_comment = importlib.import_module("db_access_offline.db_comment", ".")
+#db_employee = importlib.import_module("db_access_offline.db_employee", ".")
 picture_taker = importlib.import_module("Codigo_Guigs.1_TakePictures",".")
 trainer = importlib.import_module("Codigo_Guigs.2_TrainModel")
 recognizer = importlib.import_module("Codigo_Guigs.3_Recognizer")
+sql = importlib.import_module("db_access_online.SQL2object_Interaction")
 
 LARGE_FONT = ("Verdana", 12)
 STRONG_FONT = ("verdana 12 bold")
@@ -33,6 +34,18 @@ banco de dados usuario:iduser|name|email|password|admin|score|path
 banco de dados de comentarios:idcom|iduser|data|comment|score|area
 
 '''
+
+try:
+    db = sql.mysql.connect(host='localhost',
+                       user='root',
+                       password='pythaon',
+                       database='hackaluna')
+
+    cursor = db.cursor()
+    online=True
+except:
+    print("Not connected to server")
+    online=False
 
 
 
@@ -105,9 +118,13 @@ class Window(Tk):
         self.show_frame(FUNCIONARIO)
 
     def mostrar_comentario(self, ID):
-        self.pagina[COMENTARIOS].editar_lista()
-        self.show_frame((COMENTARIOS))
-        print("mostrando comentario " + str(ID))
+        #self.pagina[COMENTARIOS].editar_lista()
+        #self.show_frame((COMENTARIOS))
+        comentario=sql.fetch_comment_by_id(ID)
+        windown_comentario=Toplevel(self)
+        windown_comentario.title(comentario.area)
+        Label(windown_comentario, text=comentario.getMessage()).grid(row=0, column=0)
+        Button(windown_comentario, text="exit", command=windown_comentario.destroy).grid(row=1, column=1)
 
     def tabela_funcionarios(self):
         self.pagina[FUNCIONARIOS].editar_lista()
@@ -150,13 +167,22 @@ class Home_page(Frame):
                          command=lambda: trainer.Train())
         button6.grid(row=7, column=0, sticky="e")
 
-        button7 = Button(self, text="Testar",
-                         command=lambda: recognizer.Recognize())
+        button7 = Button(self, text="Testar",#ser adicionado no client.py
+                         command=self.reconhecer())
         button7.grid(row=7,column=1, sticky="w")
 
         button5 = Button(self, text="sair",
                          command=lambda: self.controller.show_frame(LOGIN), width=4)
         button5.grid(row=8, column=2, sticky="w")
+
+    def reconhecer(self):#ser adicionado no client.py
+        aparecer, sorrir= recognizer.Recognize(sql.show_only_name_with_id())
+        for id in aparecer:
+            usuario=sql.fetch_employee_by_id(id)
+            usuario.how_many_times+=1
+        for id in sorrir:
+            comentario=sql.fetch_comment_by_id(id)
+            comentario.smile=1
 
 
 class Login_page(Frame):
@@ -184,7 +210,7 @@ class Login_page(Frame):
     def testar(self, *args):
         mail = self.nome.get()
         password = self.senha.get()
-        usuario = db_employee.getEmployeePerEmail(mail)
+        usuario = sql.fetch_employee_by_email(mail)
 
         try:
             if usuario.getPassword() != password and not(usuario.getIsAdmin()):
@@ -230,7 +256,13 @@ class Pontuacao_page(Frame):
         print("busca por nome")
 
     def editar_lista(self, *args):
-        lista = db_employee.getAllEmployees()
+        lista = sql.show_employee_name_order()
+        if self.procura.get()!="":
+            for i in range(len(lista)):
+                if self.procura.get() not in lista[i].getEmployeeName():
+                    lista.pop(i)
+
+
 
         self.scrollframe.destroy()
         self.scrollframe = ScrollFrame(self)
@@ -288,20 +320,22 @@ class Adicionar_funcionario_page(Frame):
         self.controller.show_frame(HOME)
 
     def confirmar(self, *args):
-        if (db_employee.emailAvailable(self.email.get())):
+        if (sql.fetch_email_if_exist(self.email.get())):
             if (self.email.get() == "" or self.nome.get == "" or self.senha.get() == ""):
                 messagebox.showinfo("Erro", "Informações faltando")
                 self.senha.delete(0, 'end')
             else:
-
-                db_employee.addEmployee(self.nome.get(), self.email.get(), self.senha.get(), self.is_adm.get(), 0, "path", 0)
-                messagebox.showinfo("Ação completada", "Usuário adicionado com sucesso")
+                new=employee_class.Eployee(self.nome.get(),self.email.get(),self.senha.get(),0,self.is_adm.get(),'default','path',0)
+                sql.employee_2_db(new)
+                path=picture_taker.TakePicture(new.getEmployeeID())
+                new.photo_path=path
+                sql.update_employee_db(new)
                 self.nome.delete(0, 'end')
                 self.email.delete(0, 'end')
                 self.senha.delete(0, 'end')
                 self.adm.deselect()
                 # Pegar id do novo usuário e colocar como entrada no TakePicture()
-                picture_taker.TakePicture()
+                messagebox.showinfo("Ação completada", "Usuário adicionado com sucesso")
 
 
 
@@ -330,15 +364,18 @@ class Editar_funcionario_tabela_page(Frame):
 
         self.procural = Label(self, text="Procurar", bg=BRANCO).grid(row=4, column=0)
 
-        self.procura = Entry(self)
+        self.procura = Entry(self, command=self.editar_lista)
         self.procura.grid(row=4, column=1)
 
         self.scrollframe = ScrollFrame(self)
         self.scrollframe.grid(row=1, column=1, columnspan=5)
 
     def editar_lista(self, *args):
-        lista = db_employee.getAllEmployees()
-
+        lista = sql.show_employee_id_order()
+        if self.procura.get()!="":
+            for i in range(len(lista)):
+                if self.procura.get() not in lista[i].getEmployeeName():
+                    lista.pop(i)
         self.scrollframe.destroy()
         self.scrollframe = ScrollFrame(self)
         self.scrollframe.grid(row=1, column=1, columnspan=5)
@@ -385,18 +422,20 @@ class Editar_funcionario_individual_page(Frame):
 
     def atualizar(self, ID):
         self.ID = ID
-        self.label2.configure(text="Nome: " + db_employee.getEmployeePerID(ID).getEmployeeName())
+        self.label2.configure(text="Nome: " + sql.fetch_employee_by_id.getEmployeeName())
 
     def apagar(self, *args):
-        db_employee.deleteEmployee(self.ID)
+        sql.delete_employee_db(sql.fetch_employee_by_id(self.ID))
         messagebox.showinfo("Ação completada", "Usuário apagado com sucesso")
         self.email.delete(0, 'end')
         self.controller.tabela_funcionarios()
 
     def confirmar(self, *args):
         email = self.email.get()
-        if (db_employee.emailAvailable(email)):
-            db_employee.setEmployeeEmail(self.ID, email)
+        if (sql.fetch_email_if_exist(email)):
+            new=sql.fetch_employee_by_id(self.ID)
+            new.employeeEmail=email
+            sql.update_employee_db(new)
             messagebox.showinfo("Ação completada", "Usuário atualizado com sucesso")
             self.controller.tabela_funcionarios()
             self.email.delete(0, 'end')
@@ -428,7 +467,7 @@ class Comentarios_page(Frame):
 
         self.procural = Label(self, text="Procurar", bg=BRANCO).grid(row=4, column=0)
 
-        self.procura = Entry(self)
+        self.procura = Entry(self, command=self.editar_lista)
         self.procura.grid(row=4, column=1)
 
         self.scrollframe = ScrollFrame(self)
@@ -436,8 +475,12 @@ class Comentarios_page(Frame):
         self.editar_lista()
 
     def editar_lista(self, *args):
-        db_comment = importlib.import_module("db_access_offline.db_comment", ".")
-        lista = db_comment.getAllComments()
+        #db_comment = importlib.import_module("db_access_offline.db_comment", ".")
+        lista = sql.show_comment_id_order()
+        if self.procura.get()!="":
+            for i in range(len(lista)):
+                if self.procura.get() not in lista[i].getArea():
+                    lista.pop(i)
 
         self.scrollframe.destroy()
         self.scrollframe = ScrollFrame(self)
