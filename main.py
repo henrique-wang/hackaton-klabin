@@ -163,20 +163,21 @@ class Home_page(Frame):
                          command=lambda: self.controller.show_frame(COMENTARIOS), width=21)
         button4.grid(row=6, column=1, sticky="w")
 
-        button6 = Button(self, text="Treinar",
-                         command=lambda: trainer.Train())
-        button6.grid(row=7, column=0, sticky="e")
+        #button6 = Button(self, text="Treinar",
+        #                 command= self.train())
+        #button6.grid(row=7, column=0, sticky="e")
 
-        button7 = Button(self, text="Testar",#ser adicionado no client.py
-                         command=self.reconhecer())
-        button7.grid(row=7,column=1, sticky="w")
+        #button7 = Button(self, text="Testar",#ser adicionado no client.py
+        #                 command=self.reconhecer())
+        #button7.grid(row=7,column=1, sticky="w")
 
         button5 = Button(self, text="sair",
                          command=lambda: self.controller.show_frame(LOGIN), width=4)
         button5.grid(row=8, column=2, sticky="w")
 
     def reconhecer(self):#ser adicionado no client.py
-        aparecer, sorrir= recognizer.Recognize(sql.show_only_name_with_id())
+        list_id, list_name = sql.show_only_name_with_id()
+        aparecer, sorrir= recognizer.Recognize(list_id, list_name)
         for id in aparecer:
             usuario=sql.fetch_employee_by_id(id)
             usuario.how_many_times+=1
@@ -184,6 +185,8 @@ class Home_page(Frame):
             comentario=sql.fetch_comment_by_id(id)
             comentario.smile=1
 
+    def train(self):
+        trainer.Train()
 
 class Login_page(Frame):
 
@@ -239,14 +242,19 @@ class Pontuacao_page(Frame):
 
         self.buscal = Label(self, text="Procurar:", font="Verdana 8", bg=BRANCO)
         self.buscal.grid(row=4, column=0)
+        #self.sv = StringVar()
+        #self.sv.trace("w", lambda name, index, mode, lambda: self.editar_lista())
+        self.scrollframe = ScrollFrame(self)
+        self.scrollframe.grid(row=1, column=1, columnspan=3)
         self.busca = Entry(self)
+        self.busca.bind("<KeyRelease>",self.editar_lista())
         self.busca.grid(row=4, column=1)
         self.button2 = Button(self, text="procurar", font="verdana 8",
                               command=self.buscar)
         self.button2.grid(row=4, column=3)
 
-        self.scrollframe = ScrollFrame(self)
-        self.scrollframe.grid(row=1, column=1, columnspan=3)
+        #self.scrollframe = ScrollFrame(self)
+        #self.scrollframe.grid(row=1, column=1, columnspan=3)
 
     def sair(self, *args):
         self.busca.delete(0, 'end')
@@ -257,9 +265,9 @@ class Pontuacao_page(Frame):
 
     def editar_lista(self, *args):
         lista = sql.show_employee_name_order()
-        if self.procura.get()!="":
+        if self.busca.get()!="":
             for i in range(len(lista)):
-                if self.procura.get() not in lista[i].getEmployeeName():
+                if self.busca.get() not in lista[i].getEmployeeName():
                     lista.pop(i)
 
 
@@ -325,10 +333,12 @@ class Adicionar_funcionario_page(Frame):
                 messagebox.showinfo("Erro", "Informações faltando")
                 self.senha.delete(0, 'end')
             else:
-                new=employee_class.Eployee(self.nome.get(),self.email.get(),self.senha.get(),0,self.is_adm.get(),'default','path',0)
-                sql.employee_2_db(new)
+                new=employee_class.Employee(self.nome.get(),self.email.get(),self.senha.get(),0,self.is_adm.get(),'DEFAULT','path',0)
+                id=sql.employee_2_db(new)
+                new.id = id
                 path=picture_taker.TakePicture(new.getEmployeeID())
                 new.photo_path=path
+                print(new)
                 sql.update_employee_db(new)
                 self.nome.delete(0, 'end')
                 self.email.delete(0, 'end')
@@ -364,11 +374,16 @@ class Editar_funcionario_tabela_page(Frame):
 
         self.procural = Label(self, text="Procurar", bg=BRANCO).grid(row=4, column=0)
 
-        self.procura = Entry(self, command=self.editar_lista)
-        self.procura.grid(row=4, column=1)
-
+        #self.sv = StringVar()
+        #self.sv.trace("w",lambda name, index, mode, self.sv=self.sv: self.editar_lista())
         self.scrollframe = ScrollFrame(self)
         self.scrollframe.grid(row=1, column=1, columnspan=5)
+        self.procura = Entry(self)
+        self.procura.bind("<KeyRelease>", self.editar_lista())
+        self.procura.grid(row=4, column=1)
+
+        #self.scrollframe = ScrollFrame(self)
+        #self.scrollframe.grid(row=1, column=1, columnspan=5)
 
     def editar_lista(self, *args):
         lista = sql.show_employee_id_order()
@@ -422,7 +437,7 @@ class Editar_funcionario_individual_page(Frame):
 
     def atualizar(self, ID):
         self.ID = ID
-        self.label2.configure(text="Nome: " + sql.fetch_employee_by_id.getEmployeeName())
+        self.label2.configure(text="Nome: " + sql.fetch_employee_by_id(self.ID).getEmployeeName())
 
     def apagar(self, *args):
         sql.delete_employee_db(sql.fetch_employee_by_id(self.ID))
@@ -467,11 +482,16 @@ class Comentarios_page(Frame):
 
         self.procural = Label(self, text="Procurar", bg=BRANCO).grid(row=4, column=0)
 
-        self.procura = Entry(self, command=self.editar_lista)
-        self.procura.grid(row=4, column=1)
-
+        #self.sv = StringVar()
+        #self.sv.trace("w", lambda name, index, mode, self.editar_lista())
         self.scrollframe = ScrollFrame(self)
         self.scrollframe.grid(row=1, column=1, columnspan=5)
+        self.procura = Entry(self)
+        self.procura.bind("<KeyRelease>", self.editar_lista())
+        self.procura.grid(row=4, column=1)
+
+        #self.scrollframe = ScrollFrame(self)
+        #self.scrollframe.grid(row=1, column=1, columnspan=5)
         self.editar_lista()
 
     def editar_lista(self, *args):

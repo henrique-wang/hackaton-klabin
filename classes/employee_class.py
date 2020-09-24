@@ -14,8 +14,8 @@ class Employee:
         self.how_many_times = picture
 
     def __str__(self):
-        string = "ID: {} Name: {} Email: {} isAdmin: {} Points: {} ".format(self.getEmployeeID(), self.getEmployeeName(),
-                                                    self.employeeEmail, self.getIsAdmin(), self.getScore())
+        string = "ID: {} Name: {} Email: {} isAdmin: {} Points: {} Path: {}".format(self.getEmployeeID(), self.getEmployeeName(),
+                                                    self.employeeEmail, self.getIsAdmin(), self.getScore(), self.getPhotoPath())
         return string
 
     def getEmployeeName(self):
