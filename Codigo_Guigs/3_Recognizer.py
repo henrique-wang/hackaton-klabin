@@ -89,7 +89,7 @@ def Recognize():
                     flag_smiles[id_counter]+=1
 
             # If we find a match
-            if confidence > 70:
+            if confidence > 30:
                 id = names_dict.get(id_counter)
                 confidence = "  {0}%".format(round(confidence))
                 if flag_appearance.get(id_counter)==0:
