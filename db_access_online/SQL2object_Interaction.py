@@ -121,6 +121,21 @@ def show_employee_name_order():  # dos usuarios
     return list_employee
 
 
+def show_employee_name_order_reverse():  # dos usuarios
+    query = "SELECT * FROM users ORDER BY name DESC"
+
+    cursor.execute(query)
+
+    table = cursor.fetchall()
+
+    list_employee = []
+
+    for item in table:
+        list_employee.append(db_2_employee(item))
+
+    return list_employee
+
+
 ##PRO GUIGSU
 def show_only_name_with_id():
     query = "SELECT iduser, name FROM users ORDER BY iduser"
@@ -262,8 +277,37 @@ def show_comment_date_order():
     return lista
 
 
+def show_comment_date_order_reverse():
+    query = "SELECT * FORM comments ORDER BY date DESC"
+
+    cursor.execute(query)
+
+    table = cursor.fetchall()
+
+    lista = []
+
+    for item in table:
+        lista.append(db_2_comment(item))
+    return lista
+
+
 def show_comment_area_order():
     query = "SELECT * FROM comments ORDER BY area"
+
+    cursor.execute(query)
+
+    table = cursor.fetchall()
+
+    lista = []
+
+    for item in table:
+        lista.append(db_2_comment(item))
+
+    return lista
+
+
+def show_comment_area_order_reverse():
+    query = "SELECT * FROM comments ORDER BY area DESC"
 
     cursor.execute(query)
 

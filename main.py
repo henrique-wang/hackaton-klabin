@@ -235,6 +235,8 @@ class Pontuacao_page(Frame):
         self.controller = controller
         self.label = Label(self, text="Pontuação", font=LARGE_FONT, bg=BRANCO)
         self.label.grid(row=0, column=0)
+        self.order=[1,0]
+        self.textos=["---","A-Z","Z-A","---","Cre", "Dec"]
 
         self.button1 = Button(self, text="Voltar",
                               command=self.sair)
@@ -267,13 +269,29 @@ class Pontuacao_page(Frame):
         self.scrollframe = ScrollFrame(self)
         self.scrollframe.grid(row=1, column=1, columnspan=3)
         Label(self.scrollframe.viewPort, text="Nome", font=STRONG_FONT, bg=BRANCO).grid(row=0, column=0)
-        Label(self.scrollframe.viewPort, text="Email", font=STRONG_FONT, bg=BRANCO).grid(row=0, column=1)
-        Label(self.scrollframe.viewPort, text="Pontuação", font=STRONG_FONT, bg=BRANCO).grid(row=0, column=2)
+        Button(self.scrollframe.viewPort, text=self.textos[self.order[0]], command=self.mudar_nome).grid(row=0, column=1)
+        Label(self.scrollframe.viewPort, text="Email", font=STRONG_FONT, bg=BRANCO).grid(row=0, column=2)
+        Label(self.scrollframe.viewPort, text="Pontuação", font=STRONG_FONT, bg=BRANCO).grid(row=0, column=3)
+        Button(self.scrollframe.viewPort, text=self.textos[self.order[0]+3], command=self.mudar_score()).grid(row=0,column=4)
 
         for row in range(len(lista)):
-            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeName(), bg=BRANCO).grid(row=row + 1, column=0)
+            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeName(), bg=BRANCO).grid(row=row + 1, column=0,columnspan=2)
             Label(self.scrollframe.viewPort, text=lista[row].getEmployeeEmail(), bg=BRANCO).grid(row=row + 1, column=1)
-            Label(self.scrollframe.viewPort, text=str(lista[row].getScore()), bg=BRANCO).grid(row=row + 1, column=2)
+            Label(self.scrollframe.viewPort, text=str(lista[row].getScore()), bg=BRANCO).grid(row=row + 1, column=2,columnspan=2)
+
+    def mudar_nome(self):
+        self.order[1]=0
+        if self.order[0]==1:
+            self.order[0]=2
+        else:
+            self.order[0]=1
+
+    def mudar_score(self):
+        self.order[0]=0
+        if self.order[1]==1:
+            self.order[1]=2
+        else:
+            self.order[1]=1
 
 
 class Adicionar_funcionario_page(Frame):
@@ -354,6 +372,8 @@ class Editar_funcionario_tabela_page(Frame):
         self.label = Label(self, text="Funcionários", font=LARGE_FONT, bg=BRANCO)
         self.label.grid(row=0, column=0, columnspan=5)
         self.grid_columnconfigure(0, weight=1)
+        self.order=[1]
+        self.textos=["Z-A", "A-Z"]
 
         self.button = Button(self, text="Voltar",
                              command=lambda: self.controller.show_frame(HOME))
@@ -368,7 +388,10 @@ class Editar_funcionario_tabela_page(Frame):
         self.procura.grid(row=4, column=1)
 
     def editar_lista(self, *args):
-        lista = sql.show_employee_id_order()
+        if self.order[0]==1:
+            lista = sql.show_employee_name_order()
+        else:
+            lista = sql.show_employee_name_order_reverse()
         if self.procura.get()!="":
             j=0
 
@@ -380,14 +403,22 @@ class Editar_funcionario_tabela_page(Frame):
         self.scrollframe = ScrollFrame(self)
         self.scrollframe.grid(row=1, column=1, columnspan=5)
         Label(self.scrollframe.viewPort, text="Nome", font=STRONG_FONT, bg=BRANCO).grid(row=0, column=0)
-        Label(self.scrollframe.viewPort, text="Email", font=STRONG_FONT, bg=BRANCO).grid(row=0, column=1)
+        Button(self.scrollframe.viewPort, text=self.textos[self.order[0]], command= self.mudar_alfabetico).grid(row=0,column=1)
+
+        Label(self.scrollframe.viewPort, text="Email", font=STRONG_FONT, bg=BRANCO).grid(row=0, column=2)
 
         for row in range(len(lista)):
-            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeName(),bg=BRANCO).grid(row=row + 1, column=0)
-            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeEmail(),bg=BRANCO).grid(row=row + 1, column=1)
+            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeName(),bg=BRANCO).grid(row=row + 1, column=0, columnspan=2)
+            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeEmail(),bg=BRANCO).grid(row=row + 1, column=2)
             a = row
             Button(self.scrollframe.viewPort, text="editar", command=lambda x=a:
-            self.controller.atualizar_usuario(lista[x].getEmployeeID())).grid(row=row + 1, column=2)
+            self.controller.atualizar_usuario(lista[x].getEmployeeID())).grid(row=row + 1, column=3)
+
+    def mudar_alfabetico(self,*args):
+        if self.order[0]==1:
+            self.order[0]=0
+        else:
+            self.order[0]=0
 
 
 class Editar_funcionario_individual_page(Frame):
@@ -453,6 +484,8 @@ class Comentarios_page(Frame):
         self.label = Label(self, text="Comentários", font=LARGE_FONT, bg=BRANCO)
         self.label.grid(row=0, column=0, columnspan=5)
         self.grid_columnconfigure(0, weight=1)
+        self.order=[1,0] #area|data
+        self.textos=["---","A-Z","Z-A","---","Cres", "Decres"]
 
         self.button1 = Button(self, text="Voltar",
                               command=self.voltar)
@@ -469,7 +502,15 @@ class Comentarios_page(Frame):
         self.editar_lista()
 
     def editar_lista(self, *args):
-        lista = sql.show_comment_id_order()
+        if self.order[0]==1:
+            lista = sql.show_comment_area_order()
+        elif self.order[0]==2:
+            lista=sql.show_comment_area_order_reverse()
+        elif self.order[1]==1:
+            lista=sql.show_comment_date_order()
+        else:
+            lista=sql.show_comment_date_order_reverse()
+
         if self.procura.get()!="":
             j=0
             for i in range(len(lista)):
@@ -481,14 +522,30 @@ class Comentarios_page(Frame):
         self.scrollframe = ScrollFrame(self)
         self.scrollframe.grid(row=1, column=1, columnspan=5)
         Label(self.scrollframe.viewPort, text="Data", font=STRONG_FONT, bg=BRANCO).grid(row=0, column=0)
-        Label(self.scrollframe.viewPort, text="Área", font=STRONG_FONT, bg=BRANCO).grid(row=0, column=1)
+        Button(self.scrollframe.viewPort, text=self.textos[self.order[1]+3], command=self.mudar_data).grid(row=0,column=1)
+        Label(self.scrollframe.viewPort, text="Área", font=STRONG_FONT, bg=BRANCO).grid(row=0, column=2)
+        Button(self.scrollframe.viewPort, text=self.textos[self.order[0]], command=self.mudar_area).grid(row=0,column=3)
 
         for row in range(len(lista)):
-            Label(self.scrollframe.viewPort, text=lista[row].getDate(), bg=BRANCO).grid(row=row + 1, column=0)
-            Label(self.scrollframe.viewPort, text=lista[row].getArea(), bg=BRANCO).grid(row=row + 1, column=1)
+            Label(self.scrollframe.viewPort, text=lista[row].getDate(), bg=BRANCO).grid(row=row + 1, column=0, columnspan=2)
+            Label(self.scrollframe.viewPort, text=lista[row].getArea(), bg=BRANCO).grid(row=row + 1, column=2, columnspan=2)
             a = row
             Button(self.scrollframe.viewPort, text="vizualizar", command=lambda x=a:
-                self.controller.mostrar_comentario(lista[x].getCommentID())).grid(row=row + 1, column=2, sticky="e")
+                self.controller.mostrar_comentario(lista[x].getCommentID())).grid(row=row + 1, column=3, sticky="e")
+
+    def mudar_area(self):
+        self.order[1]=0
+        if self.order[0]==1:
+            self.order[0]=2
+        else:
+            self.order[0]=1
+
+    def mudar_data(self):
+        self.order[1]=0
+        if self.order[1]==1:
+            self.order[1]=2
+        else:
+            self.order[1]=1
 
     def voltar(self, *args):
         self.procura.delete(0, 'end')
