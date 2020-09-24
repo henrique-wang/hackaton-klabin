@@ -2,8 +2,13 @@ import pandas as pd
 import importlib
 from datetime import date
 from datetime import datetime
+
+import mysql.connector as mysql
+from mysql.connector import Error
+
 comment_class = importlib.import_module("classes.comment_class", ".")
 employee_class = importlib.import_module("classes.employee_class", ".")
+sql_connection = importlib.import_module("db_access_online.SQL2object_Interaction", ".")
 
 # Add comment in database
 # Receive String comment, int employeeID
@@ -12,7 +17,7 @@ def addComment(employeeID, comment, area, smile):
     commentID = getNewCommentID()
     today = date.today()
     messageDate = today.strftime("%d/%m/%y")     # dd/mm/YY
-    newData = [{'idcom': commentID, 'idemp': employeeID, 'date': messageDate, 'comment': comment,
+    newData = [{'idcom': commentID, 'iduser': employeeID, 'date': messageDate, 'comment': comment,
                     'score': 0, 'area': area, 'smile': smile}]
     dataBase = dataBase.append(newData, ignore_index=True)
     dataBase.to_csv('./db_access_offline/employee_comments_db.csv', index=False)
@@ -32,7 +37,7 @@ def getAllComments():
     comment_list = []
     for i in range(len(dataBase)):
         comment_date = datetime.strptime(dataBase["date"][i], '%d/%m/%y')
-        curr_employee_id = dataBase["idemp"][i]
+        curr_employee_id = dataBase["iduser"][i]
         curr_idcom = dataBase["idcom"][i]
         curr_data = dataBase["date"][i]
         curr_comment = dataBase["comment"][i]
@@ -55,7 +60,7 @@ def getCommentsPerDate(first_date, last_date):
     for i in range(len(dataBase)):
         comment_date = datetime.strptime(dataBase["date"][i], '%d/%m/%y')
         if (comment_date > minDate and comment_date < maxDate):
-            curr_employee_id = dataBase["idemp"][i]
+            curr_employee_id = dataBase["iduser"][i]
             curr_idcom = dataBase["idcom"][i]
             curr_data = dataBase["date"][i]
             curr_comment = dataBase["comment"][i]
@@ -73,10 +78,9 @@ def getCommentsPerDate(first_date, last_date):
 def getCommentsPerEmployee(employee):
     dataBase = pd.read_csv('./db_access_offline/employee_comments_db.csv')
     employeeID = employee.getEmployeeID()
-    print("employeeid", employeeID)
     comment_list = []
     for i in range(len(dataBase)):
-        curr_employee_id = dataBase["idemp"][i]
+        curr_employee_id = dataBase["iduser"][i]
         if (employeeID == curr_employee_id):
             curr_idcom = dataBase["idcom"][i]
             curr_data = dataBase["date"][i]
@@ -106,6 +110,22 @@ def setPointForComment(comID, newPoint):
             return True
     # UserID not found
     return False
+
+def uploadComment():
+    listComments = getAllComments()
+    try:
+        db = mysql.connect(host='localhost',
+                           user='root',
+                           password='pythaon',
+                           database='hackaluna')
+        if db.is_connected():
+            for comment in listComments:
+                sql_connection.comment_2_db(comment)
+            newDB = pd.DataFrame(columns=['iduser', 'name', 'email', 'password', 'admin', 'score', 'path', 'howmany'])
+            newDB.to_csv('./db_access_offline/employee_db.csv', index=False)
+    except:
+        print("An exception occurred")
+
 """
 def main():
     dataBase = pd.read_csv('employee_comments_db.csv')

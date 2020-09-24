@@ -297,7 +297,7 @@ class Adicionar_funcionario_page(Frame):
                 self.senha.delete(0, 'end')
             else:
 
-                db_employee.addEmployee(self.nome.get(), self.email.get(), self.senha.get(), self.is_adm.get(), 0, "path")
+                db_employee.addEmployee(self.nome.get(), self.email.get(), self.senha.get(), self.is_adm.get(), 0, "path", 0)
                 messagebox.showinfo("Ação completada", "Usuário adicionado com sucesso")
                 self.nome.delete(0, 'end')
                 self.email.delete(0, 'end')

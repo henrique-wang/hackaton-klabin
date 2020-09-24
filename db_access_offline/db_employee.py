@@ -13,15 +13,16 @@ def getAllEmployees():
     print(dataBase)
     employee_list = []
     for i in range(len(dataBase)):
-        employee_name = dataBase["first_name"][i]
-        employee_id = dataBase["idemp"][i]
+        employee_name = dataBase["name"][i]
+        employee_id = dataBase["iduser"][i]
         employee_email = dataBase["email"][i]
         employee_password = dataBase["password"][i]
-        employee_isAdmin = dataBase["isadmin"][i]
+        employee_isAdmin = dataBase["admin"][i]
         employee_score = dataBase["score"][i]
-        employee_path = dataBase["photo_path"][i]
+        employee_path = dataBase["path"][i]
+        employee_picture = dataBase["howmany"][i]
         curr_employee = employee_class.Employee(employee_name, employee_email, employee_password, employee_score,
-                                                employee_isAdmin, employee_id, employee_path)
+                                                employee_isAdmin, employee_id, employee_path, employee_picture)
         employee_list.append(curr_employee)
     return employee_list
 
@@ -33,14 +34,15 @@ def getEmployeePerEmail(userEmail):
     for i in range(len(dataBase)):
         employee_email = dataBase["email"][i]
         if (employee_email == userEmail):
-            employee_name = dataBase["first_name"][i]
-            employee_id = dataBase["idemp"][i]
+            employee_name = dataBase["name"][i]
+            employee_id = dataBase["iduser"][i]
             employee_password = dataBase["password"][i]
-            employee_isAdmin = dataBase["isadmin"][i]
+            employee_isAdmin = dataBase["admin"][i]
             employee_score = dataBase["score"][i]
-            employee_path = dataBase["photo_path"][i]
+            employee_path = dataBase["path"][i]
+            employee_picture = dataBase["howmany"][i]
             curr_employee = employee_class.Employee(employee_name, employee_email, employee_password, employee_score,
-                                                employee_isAdmin, employee_id, employee_path)
+                                                    employee_isAdmin, employee_id, employee_path, employee_picture)
             return curr_employee
     return False
 
@@ -51,16 +53,17 @@ def getEmployeePerEmail(userEmail):
 def getEmployeePerID(userID):
     dataBase = pd.read_csv('./db_access_offline/employee_db.csv')
     for i in range(len(dataBase)):
-        employee_id = dataBase["idemp"][i]
+        employee_id = dataBase["iduser"][i]
         if (employee_id == userID):
-            employee_name = dataBase["first_name"][i]
+            employee_name = dataBase["name"][i]
             employee_email = dataBase["email"][i]
             employee_password = dataBase["password"][i]
-            employee_isAdmin = dataBase["isadmin"][i]
+            employee_isAdmin = dataBase["admin"][i]
             employee_score = dataBase["score"][i]
-            employee_path = dataBase["photo_path"][i]
+            employee_path = dataBase["path"][i]
+            employee_picture = dataBase["howmany"][i]
             curr_employee = employee_class.Employee(employee_name, employee_email, employee_password, employee_score,
-                                                employee_isAdmin, employee_id, employee_path)
+                                                    employee_isAdmin, employee_id, employee_path, employee_picture)
             return curr_employee
     return False
 
@@ -71,10 +74,10 @@ def getEmployeePerID(userID):
 def setEmployeeName(userID, newName):
     dataBase = pd.read_csv('./db_access_offline/employee_db.csv')
     for i in range(len(dataBase)):
-        employee_id = dataBase["idemp"][i]
+        employee_id = dataBase["iduser"][i]
         if (employee_id == userID):
             # Change Employee Name
-            dataBase["first_name"][i] = newName
+            dataBase["name"][i] = newName
             # Save new value
             dataBase.to_csv('./db_access_offline/employee_db.csv', index=False)
             return True
@@ -88,7 +91,7 @@ def setEmployeeName(userID, newName):
 def setEmployeeEmail(userID, newEmail):
     dataBase = pd.read_csv('./db_access_offline/employee_db.csv')
     for i in range(len(dataBase)):
-        employee_id = dataBase["idemp"][i]
+        employee_id = dataBase["iduser"][i]
         if (employee_id == userID):
             # Change Employee Email
             dataBase["email"][i] = newEmail
@@ -105,18 +108,19 @@ def setEmployeeEmail(userID, newEmail):
 def deleteEmployee(userID):
     userIDfound = False
     dataBase = pd.read_csv('./db_access_offline/employee_db.csv')
-    newDB = pd.DataFrame(columns=['idemp', 'first_name', 'email'])
+    newDB = pd.DataFrame(columns=['iduser', 'name', 'email', 'password', 'admin', 'score', 'path', 'howmany'])
     for i in range(len(dataBase)):
-        employee_id = dataBase["idemp"][i]
+        employee_id = dataBase["iduser"][i]
         if (employee_id != userID):
             employee_email = dataBase["email"][i]
             employee_password = dataBase["password"][i]
-            employee_isAdmin = dataBase["isadmin"][i]
+            employee_isAdmin = dataBase["admin"][i]
             employee_score = dataBase["score"][i]
-            employee_name = dataBase["first_name"][i]
-            employee_path = dataBase["photo_path"][i]
-            newData = [{'idemp': employee_id, 'first_name': employee_name, 'email': employee_email, "password": employee_password,
-                        'isadmin': employee_isAdmin, 'score': employee_score, 'photo_path': employee_path}]
+            employee_name = dataBase["name"][i]
+            employee_path = dataBase["path"][i]
+            employee_picture = dataBase["howmany"][i]
+            newData = [{'iduser': employee_id, 'name': employee_name, 'email': employee_email, "password": employee_password,
+                        'admin': employee_isAdmin, 'score': employee_score, 'path': employee_path, 'howmany': employee_picture}]
             newDB = newDB.append(newData, ignore_index=True)
         if (employee_id == userID):
             userIDfound = True
@@ -127,14 +131,14 @@ def deleteEmployee(userID):
 # Receive String userName, String userEmail
 # Return True if he was added
 # Return False if he wasn't
-def addEmployee(userName, userEmail, employee_password, employee_isAdmin, employee_score, employee_path):
+def addEmployee(userName, userEmail, employee_password, employee_isAdmin, employee_score, employee_path, employee_picture):
     dataBase = pd.read_csv('./db_access_offline/employee_db.csv')
     userEmailAvailable = emailAvailable(userEmail)
     if (userEmailAvailable):
         employee_id = getNewEmployeeID()
         newData = [
-            {'idemp': employee_id, 'first_name': userName, 'email': userEmail, "password": employee_password,
-             'isadmin': employee_isAdmin, 'score': employee_score, 'photo_path': employee_path}]
+            {'iduser': employee_id, 'name': userName, 'email': userEmail, "password": employee_password,
+             'admin': employee_isAdmin, 'score': employee_score, 'path': employee_path, 'howmany': employee_picture}]
         dataBase = dataBase.append(newData, ignore_index=True)
         dataBase.to_csv('./db_access_offline/employee_db.csv', index=False)
         return True
@@ -146,7 +150,7 @@ def addEmployee(userName, userEmail, employee_password, employee_isAdmin, employ
 def getNewEmployeeID():
     dataBase = pd.read_csv('./db_access_offline/employee_db.csv')
     employeeNum = len(dataBase)
-    lastUsedID = dataBase["idemp"][employeeNum - 1]
+    lastUsedID = dataBase["iduser"][employeeNum - 1]
     return lastUsedID + 1
 
 # Check if email is available or not
@@ -160,6 +164,18 @@ def emailAvailable(email):
         if (currEmail == email):
             return False
     return True
+
+# Receive mysql.connector.connect()
+# Update EmployeeList and Return True, if it is connected
+# EmployeeList stays the same and Return False, if it isn't connected
+def updateEmployeeList(db):
+    query = "SELECT * FROM users"
+    if (db.is_connected()):
+        dataBase = pd.read_sql(query, db)
+        dataBase.to_csv('./db_access_offline/employee_db.csv', index=False)
+        return True
+    else:
+        return False
 
 """
 def main():
