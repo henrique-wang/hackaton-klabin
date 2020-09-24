@@ -34,7 +34,6 @@ banco de dados de comentarios:idcom|iduser|data|comment|score|area
 
 '''
 
-adm = {"a": ""}
 
 
 class ScrollFrame(Frame):  # https://gist.github.com/mp035/9f2027c3ef9172264532fcd6262f3b01 by mp035
@@ -186,7 +185,6 @@ class Login_page(Frame):
         mail = self.nome.get()
         password = self.senha.get()
         usuario = db_employee.getEmployeePerEmail(mail)
-        print(usuario)
 
         try:
             if usuario.getPassword() != password and not(usuario.getIsAdmin()):
@@ -290,7 +288,6 @@ class Adicionar_funcionario_page(Frame):
         self.controller.show_frame(HOME)
 
     def confirmar(self, *args):
-        print("adicionar senha")
         if (db_employee.emailAvailable(self.email.get())):
             if (self.email.get() == "" or self.nome.get == "" or self.senha.get() == ""):
                 messagebox.showinfo("Erro", "Informações faltando")
@@ -439,8 +436,8 @@ class Comentarios_page(Frame):
         self.editar_lista()
 
     def editar_lista(self, *args):
-        dbb_comment = importlib.import_module("db_access_offline.db_comment", ".")
-        lista = dbb_comment.getAllComments()
+        db_comment = importlib.import_module("db_access_offline.db_comment", ".")
+        lista = db_comment.getAllComments()
 
         self.scrollframe.destroy()
         self.scrollframe = ScrollFrame(self)
@@ -453,7 +450,7 @@ class Comentarios_page(Frame):
             Label(self.scrollframe.viewPort, text=lista[row].getArea(), bg=BRANCO).grid(row=row + 1, column=1)
             a = row
             Button(self.scrollframe.viewPort, text="vizualizar", command=lambda x=a:
-            self.controller.mostrar_comentario(x)).grid(row=row + 1, column=2, sticky="e")
+                self.controller.mostrar_comentario(lista[x].getCommentID())).grid(row=row + 1, column=2, sticky="e")
 
     def voltar(self, *args):
         self.procura.delete(0, 'end')
