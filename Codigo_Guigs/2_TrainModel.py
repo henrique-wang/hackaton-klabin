@@ -44,10 +44,12 @@ def Train():
     xtrain, ylabel = getImagesAndLabels(dataset_dir)
     recognizer.train(xtrain, np.array(ylabel))
     # Save the model into trainer/trainer.yml
-    trainer_dir = os.path.join(BASE_DIR, 'trainer/trainer.yml')
+    #trainer_dir = os.path.join(BASE_DIR, 'trainer/trainer.yml')
+    trainer_dir = os.path.join(BASE_DIR, 'trainer')
     if not os.path.exists(trainer_dir):
         print("Cretaing new directory")
         os.mkdir(os.path.join(BASE_DIR, 'trainer'))
+    trainer_dir = os.path.join(BASE_DIR, 'trainer/trainer.yml')
     s=trainer_dir.replace('\\', '/')
     print(s)
     recognizer.write(s)

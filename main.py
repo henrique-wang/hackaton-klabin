@@ -163,9 +163,9 @@ class Home_page(Frame):
                          command=lambda: self.controller.show_frame(COMENTARIOS), width=21)
         button4.grid(row=6, column=1, sticky="w")
 
-        #button6 = Button(self, text="Treinar",
-        #                 command= self.train())
-        #button6.grid(row=7, column=0, sticky="e")
+        button6 = Button(self, text="Treinar",
+                         command= self.train())
+        button6.grid(row=7, column=0, sticky="e")
 
         #button7 = Button(self, text="Testar",#ser adicionado no client.py
         #                 command=self.reconhecer())
@@ -242,33 +242,24 @@ class Pontuacao_page(Frame):
 
         self.buscal = Label(self, text="Procurar:", font="Verdana 8", bg=BRANCO)
         self.buscal.grid(row=4, column=0)
-        #self.sv = StringVar()
-        #self.sv.trace("w", lambda name, index, mode, lambda: self.editar_lista())
         self.scrollframe = ScrollFrame(self)
         self.scrollframe.grid(row=1, column=1, columnspan=3)
         self.busca = Entry(self)
-        self.busca.bind("<KeyRelease>",self.editar_lista())
+        self.busca.bind("<KeyRelease>",self.editar_lista)
         self.busca.grid(row=4, column=1)
-        self.button2 = Button(self, text="procurar", font="verdana 8",
-                              command=self.buscar)
-        self.button2.grid(row=4, column=3)
-
-        #self.scrollframe = ScrollFrame(self)
-        #self.scrollframe.grid(row=1, column=1, columnspan=3)
 
     def sair(self, *args):
         self.busca.delete(0, 'end')
         self.controller.show_frame(HOME)
 
-    def buscar(self, *args):
-        print("busca por nome")
-
     def editar_lista(self, *args):
         lista = sql.show_employee_name_order()
         if self.busca.get()!="":
+            j=0
             for i in range(len(lista)):
-                if self.busca.get() not in lista[i].getEmployeeName():
-                    lista.pop(i)
+                if self.busca.get() not in lista[i-j].getEmployeeName():
+                    lista.pop(i-j)
+                    j+=1
 
 
 
@@ -368,29 +359,23 @@ class Editar_funcionario_tabela_page(Frame):
                              command=lambda: self.controller.show_frame(HOME))
         self.button.grid(row=4, column=5)
 
-        self.button2 = Button(self, text='procurar',
-                              command=self.procurar)
-        self.button2.grid(row=4, column=3)
-
         self.procural = Label(self, text="Procurar", bg=BRANCO).grid(row=4, column=0)
 
-        #self.sv = StringVar()
-        #self.sv.trace("w",lambda name, index, mode, self.sv=self.sv: self.editar_lista())
         self.scrollframe = ScrollFrame(self)
         self.scrollframe.grid(row=1, column=1, columnspan=5)
         self.procura = Entry(self)
-        self.procura.bind("<KeyRelease>", self.editar_lista())
+        self.procura.bind("<KeyRelease>", self.editar_lista)
         self.procura.grid(row=4, column=1)
-
-        #self.scrollframe = ScrollFrame(self)
-        #self.scrollframe.grid(row=1, column=1, columnspan=5)
 
     def editar_lista(self, *args):
         lista = sql.show_employee_id_order()
         if self.procura.get()!="":
+            j=0
+
             for i in range(len(lista)):
-                if self.procura.get() not in lista[i].getEmployeeName():
-                    lista.pop(i)
+                if self.procura.get() not in lista[i-j].getEmployeeName():
+                    lista.pop(i-j)
+                    j+=1
         self.scrollframe.destroy()
         self.scrollframe = ScrollFrame(self)
         self.scrollframe.grid(row=1, column=1, columnspan=5)
@@ -398,14 +383,11 @@ class Editar_funcionario_tabela_page(Frame):
         Label(self.scrollframe.viewPort, text="Email", font=STRONG_FONT, bg=BRANCO).grid(row=0, column=1)
 
         for row in range(len(lista)):
-            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeName()).grid(row=row + 1, column=0)
-            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeEmail()).grid(row=row + 1, column=1)
+            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeName(),bg=BRANCO).grid(row=row + 1, column=0)
+            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeEmail(),bg=BRANCO).grid(row=row + 1, column=1)
             a = row
             Button(self.scrollframe.viewPort, text="editar", command=lambda x=a:
             self.controller.atualizar_usuario(lista[x].getEmployeeID())).grid(row=row + 1, column=2)
-
-    def procurar(self, *args):
-        print('procurar')
 
 
 class Editar_funcionario_individual_page(Frame):
@@ -476,31 +458,24 @@ class Comentarios_page(Frame):
                               command=self.voltar)
         self.button1.grid(row=4, column=5)
 
-        self.button2 = Button(self, text='procurar',
-                              command=self.procurar)
-        self.button2.grid(row=4, column=3)
-
         self.procural = Label(self, text="Procurar", bg=BRANCO).grid(row=4, column=0)
 
-        #self.sv = StringVar()
-        #self.sv.trace("w", lambda name, index, mode, self.editar_lista())
         self.scrollframe = ScrollFrame(self)
         self.scrollframe.grid(row=1, column=1, columnspan=5)
         self.procura = Entry(self)
-        self.procura.bind("<KeyRelease>", self.editar_lista())
+        self.procura.bind("<KeyRelease>", self.editar_lista)
         self.procura.grid(row=4, column=1)
 
-        #self.scrollframe = ScrollFrame(self)
-        #self.scrollframe.grid(row=1, column=1, columnspan=5)
         self.editar_lista()
 
     def editar_lista(self, *args):
-        #db_comment = importlib.import_module("db_access_offline.db_comment", ".")
         lista = sql.show_comment_id_order()
         if self.procura.get()!="":
+            j=0
             for i in range(len(lista)):
-                if self.procura.get() not in lista[i].getArea():
-                    lista.pop(i)
+                if self.procura.get() not in lista[i-j].getArea():
+                    lista.pop(i-j)
+                    j+=1
 
         self.scrollframe.destroy()
         self.scrollframe = ScrollFrame(self)
@@ -518,9 +493,6 @@ class Comentarios_page(Frame):
     def voltar(self, *args):
         self.procura.delete(0, 'end')
         self.controller.show_frame(HOME)
-
-    def procurar(self, *args):
-        print('procurar')
 
 
 def main():
