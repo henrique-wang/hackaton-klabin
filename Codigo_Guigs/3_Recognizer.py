@@ -2,12 +2,14 @@ import cv2
 import numpy as np
 import os
 import pandas as pd
+import pyttsx3
 
 
 
 
 # We need to get the Name list of the users organized by ID
 def Recognize(list_id,list_name):
+    engine = pyttsx3.init()
 
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     cascade_dir = os.path.join(BASE_DIR, "cascades/haarcascade_frontalface_default.xml")
@@ -66,13 +68,19 @@ def Recognize(list_id,list_name):
             for (sx, sy, sw, sh) in smiles:
                 cv2.rectangle(roi_color, (sx, sy), ((sx + sw), (sy + sh)), (0, 0, 255), 3)
                 if flag_smiles.get(id_counter)==0:
+                    text=('Belo sorriso'+names_dict.get(id_counter))
+                    engine.say(text)
+                    engine.runAndWait()
                     flag_smiles[id_counter]+=1
 
             # If we find a match
-            if confidence > 70:
+            if confidence > 30:
                 id = names_dict.get(id_counter)
                 confidence = "  {0}%".format(round(confidence))
                 if flag_appearance.get(id_counter)==0:
+                    text=('Olá'+names_dict.get(id_counter))
+                    engine.say(text)
+                    engine.runAndWait()
                     flag_appearance[id_counter]+=1
 
 
