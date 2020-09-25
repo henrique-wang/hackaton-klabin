@@ -40,6 +40,6 @@ def main():
             smile = 1
 
     comment_db.addComment(idusers[0], message, area, smile)
-    comment_db.uploadComment()
+    comment_db.uploadComment(db)
     engine.runAndWait()
 main()

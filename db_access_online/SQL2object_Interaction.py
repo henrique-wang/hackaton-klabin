@@ -150,6 +150,35 @@ def show_only_name_with_id():
 
     return lista_id, lista_name
 
+def show_employee_score_order():
+    query = "SELECT * FROM users ORDER BY score"
+
+    cursor.execute(query)
+
+    table = cursor.fetchall()
+
+    list_employee = []
+
+    for item in table:
+        list_employee.append(db_2_employee(item))
+
+    return list_employee
+
+def show_employee_score_order_reverse():
+    query = "SELECT * FROM users ORDER BY score DESC"
+
+    cursor.execute(query)
+
+    table = cursor.fetchall()
+
+    list_employee = []
+
+    for item in table:
+        list_employee.append(db_2_employee(item))
+
+    return list_employee
+
+
 
 def fetch_employee_by_id(iduser):
     query = "SELECT * FROM users WHERE iduser = " + str(iduser)
@@ -264,7 +293,7 @@ def show_comment_iduser_order():  # dos usuarios
 
 
 def show_comment_date_order():
-    query = "SELECT * FORM comments ORDER BY date"
+    query = "SELECT * FROM comments ORDER BY date"
 
     cursor.execute(query)
 
@@ -278,7 +307,7 @@ def show_comment_date_order():
 
 
 def show_comment_date_order_reverse():
-    query = "SELECT * FORM comments ORDER BY date DESC"
+    query = "SELECT * FROM comments ORDER BY date DESC"
 
     cursor.execute(query)
 

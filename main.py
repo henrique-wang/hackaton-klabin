@@ -164,12 +164,12 @@ class Home_page(Frame):
         button4.grid(row=6, column=1, sticky="w")
 
         button6 = Button(self, text="Treinar",
-                         command= self.train())
+                         command= self.train)
         button6.grid(row=7, column=0, sticky="e")
 
-        #button7 = Button(self, text="Testar",#ser adicionado no client.py
-        #                 command=self.reconhecer())
-        #button7.grid(row=7,column=1, sticky="w")
+        button7 = Button(self, text="Testar",#ser adicionado no client.py
+                         command=self.reconhecer)
+        button7.grid(row=7,column=1, sticky="w")
 
         button5 = Button(self, text="sair",
                          command=lambda: self.controller.show_frame(LOGIN), width=4)
@@ -255,7 +255,14 @@ class Pontuacao_page(Frame):
         self.controller.show_frame(HOME)
 
     def editar_lista(self, *args):
-        lista = sql.show_employee_name_order()
+        if self.order[0] == 1:
+            lista = sql.show_employee_name_order()
+        elif self.order[0] == 2:
+            lista = sql.show_employee_name_order_reverse()
+        elif self.order[1] == 1:
+            lista = sql.show_employee_score_order()
+        else:
+            lista = sql.show_employee_score_order_reverse()
         if self.busca.get()!="":
             j=0
             for i in range(len(lista)):
@@ -272,12 +279,12 @@ class Pontuacao_page(Frame):
         Button(self.scrollframe.viewPort, text=self.textos[self.order[0]], command=self.mudar_nome).grid(row=0, column=1)
         Label(self.scrollframe.viewPort, text="Email", font=STRONG_FONT, bg=BRANCO).grid(row=0, column=2)
         Label(self.scrollframe.viewPort, text="Pontuação", font=STRONG_FONT, bg=BRANCO).grid(row=0, column=3)
-        Button(self.scrollframe.viewPort, text=self.textos[self.order[0]+3], command=self.mudar_score()).grid(row=0,column=4)
+        Button(self.scrollframe.viewPort, text=self.textos[self.order[1]+3], command=self.mudar_score).grid(row=0,column=4)
 
         for row in range(len(lista)):
             Label(self.scrollframe.viewPort, text=lista[row].getEmployeeName(), bg=BRANCO).grid(row=row + 1, column=0,columnspan=2)
-            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeEmail(), bg=BRANCO).grid(row=row + 1, column=1)
-            Label(self.scrollframe.viewPort, text=str(lista[row].getScore()), bg=BRANCO).grid(row=row + 1, column=2,columnspan=2)
+            Label(self.scrollframe.viewPort, text=lista[row].getEmployeeEmail(), bg=BRANCO).grid(row=row + 1, column=2)
+            Label(self.scrollframe.viewPort, text=str(lista[row].getScore()), bg=BRANCO).grid(row=row + 1, column=3,columnspan=2)
 
     def mudar_nome(self):
         self.order[1]=0
@@ -285,6 +292,7 @@ class Pontuacao_page(Frame):
             self.order[0]=2
         else:
             self.order[0]=1
+        self.editar_lista()
 
     def mudar_score(self):
         self.order[0]=0
@@ -292,7 +300,7 @@ class Pontuacao_page(Frame):
             self.order[1]=2
         else:
             self.order[1]=1
-
+        self.editar_lista()
 
 class Adicionar_funcionario_page(Frame):
 
@@ -418,7 +426,8 @@ class Editar_funcionario_tabela_page(Frame):
         if self.order[0]==1:
             self.order[0]=0
         else:
-            self.order[0]=0
+            self.order[0]=1
+        self.editar_lista()
 
 
 class Editar_funcionario_individual_page(Frame):
@@ -531,7 +540,7 @@ class Comentarios_page(Frame):
             Label(self.scrollframe.viewPort, text=lista[row].getArea(), bg=BRANCO).grid(row=row + 1, column=2, columnspan=2)
             a = row
             Button(self.scrollframe.viewPort, text="vizualizar", command=lambda x=a:
-                self.controller.mostrar_comentario(lista[x].getCommentID())).grid(row=row + 1, column=3, sticky="e")
+                self.controller.mostrar_comentario(lista[x].getCommentID())).grid(row=row + 1, column=4, sticky="e")
 
     def mudar_area(self):
         self.order[1]=0
@@ -539,13 +548,15 @@ class Comentarios_page(Frame):
             self.order[0]=2
         else:
             self.order[0]=1
+        self.editar_lista()
 
     def mudar_data(self):
-        self.order[1]=0
+        self.order[0]=0
         if self.order[1]==1:
             self.order[1]=2
         else:
             self.order[1]=1
+        self.editar_lista()
 
     def voltar(self, *args):
         self.procura.delete(0, 'end')

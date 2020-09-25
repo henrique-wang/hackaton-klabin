@@ -90,7 +90,7 @@ def Recognize(list_id,list_name):
                 confidence = "  {0}%".format(round(confidence))
 
             cv2.putText(img, str(id), (x + 5, y - 5), font, 1, (255, 255, 255), 2)
-            cv2.putText(img, str(confidence), (x + 5, y + h - 5), font, 1, (255, 255, 0), 1)
+            #cv2.putText(img, str(confidence), (x + 5, y + h - 5), font, 1, (255, 255, 0), 1)
 
         cv2.imshow('camera', img)
         k = cv2.waitKey(10) & 0xff  # Press 'ESC' for exiting video
@@ -102,6 +102,6 @@ def Recognize(list_id,list_name):
     cv2.destroyAllWindows()
     IDs_of_Appearance = [key for (key, value) in flag_appearance.items() if value == 1]
     IDs_of_Smile = [key for (key, value) in flag_smiles.items() if value == 1]
-    print(IDs_of_Appearance, IDs_of_Smile)
+    print(IDs_of_Appearance, IDs_of_Smile)#APAGAR COMENTARIO
     return IDs_of_Appearance, IDs_of_Smile
 

@@ -14,7 +14,7 @@ sql_connection = importlib.import_module("db_access_online.SQL2object_Interactio
 # Receive String comment, int employeeID
 def addComment(employeeID, comment, area, smile):
     dataBase = pd.read_csv('./db_access_offline/employee_comments_db.csv')
-    commentID = getNewCommentID()
+    commentID = 'DEFAULT'
     today = date.today()
     messageDate = today.strftime("%d/%m/%y")     # dd/mm/YY
     newData = [{'idcom': commentID, 'iduser': employeeID, 'date': messageDate, 'comment': comment,
@@ -44,8 +44,8 @@ def getAllComments():
         curr_point = dataBase["score"][i]
         curr_area = dataBase["area"][i]
         curr_smile = dataBase["smile"][i]
-        comment = comment_class.Comment(curr_employee_id, curr_data, curr_comment, curr_idcom, curr_area, curr_point,
-                                        curr_smile)
+        comment = comment_class.Comment(curr_employee_id, curr_data, curr_comment, curr_idcom, curr_area, curr_smile,
+                                        curr_point)
         comment_list.append(comment)
     return comment_list
 
@@ -111,20 +111,16 @@ def setPointForComment(comID, newPoint):
     # UserID not found
     return False
 
-def uploadComment():
+def uploadComment(db):
     listComments = getAllComments()
-    try:
-        db = mysql.connect(host='localhost',
-                           user='root',
-                           password='pythaon',
-                           database='hackaluna')
-        if db.is_connected():
-            for comment in listComments:
-                sql_connection.comment_2_db(comment)
-            newDB = pd.DataFrame(columns=['iduser', 'name', 'email', 'password', 'admin', 'score', 'path', 'howmany'])
-            newDB.to_csv('./db_access_offline/employee_db.csv', index=False)
-    except:
-        print("An exception occurred")
+    #try:
+    if db.is_connected():
+        for comment in listComments:
+            sql_connection.comment_2_db(comment)
+        newDB = pd.DataFrame(columns=['idcom','iduser', 'date', 'comment', 'area','smile', 'score'])
+        newDB.to_csv('./db_access_offline/employee_comments_db.csv', index=False)
+    #except:
+    #print("An exception occured")
 
 """
 def main():
