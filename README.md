@@ -1,15 +1,11 @@
-# teste-github-app
-Teste do uso do github app para desktop
+Hackathon Klabin-Empathy-SEnEC
 
-teste123 
+client.py corresponde à interação do funcionário com a Luna
 
+main.py corresponde à interface do administrador
 
-Thonk
+deve estar conectado ao banco de dados SQL
 
+comments: idcom    iduser    date    comment    score    area    smile
 
-patrick estrela
-
-
-aqui jaz um novo branchdadwaw
-
-Guigs
+users: iduser    name    email    password    path    admin    score    howmany

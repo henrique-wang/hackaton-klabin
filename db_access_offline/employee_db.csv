@@ -1,0 +1,18 @@
+iduser,name,email,password,path,admin,score,howmany
+1,thomas,thomas@oshima,senha,photos/thomas,1,0,0
+2,henrique,henrique@igor,1234,photos/wang,0,12,0
+11,guigs,guigs@lherme,password,photos/guigs,0,36,0
+12,rubello,rubello@czbslaoq,facil,photos/rubello,0,50,0
+14,neymar,adulto@ney,brunamarq,photos/neymar,0,10,0
+17,lucas,lucas@isao,tiothomas,photos/lucas,0,45,0
+19,jonathan,jon@than,jonathomas,photos/jonathan,0,12,0
+20,alexandre,ale@xandre,aleale,photos/ale,0,31,0
+23,nome,email,senha,path/nome,0,12,0
+26,scooby,scooby@dooby@doo,doo,path,0,0,0
+27,salsicha,salchicha@salsicha,salchicha,path,0,0,0
+28,Thomas,thomas@usp.br,daphine,novo/path,0,0,0
+29,celia,celia@oshima,senha,C:UsersThomasDocumentsGitHub	este-github-appCodigo_Guigsdataset29,0,0,0
+30,nome,email22,senha,C:UsersThomasDocumentsGitHub	este-github-appCodigo_Guigsdataset30,0,0,0
+31,nome,email3,senha,path,0,0,0
+32,nome4,email4,senha,C:UsersThomasDocumentsGitHub	este-github-appCodigo_Guigsdataset32,0,0,0
+33,thomas,thomas@@@,senha,C:UsersThomasDocumentsGitHub	este-github-appCodigo_Guigsdataset33,0,0,0
